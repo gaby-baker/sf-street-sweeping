@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SF Street Sweeping Lookup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 32px;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 28px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .example-text {
+            color: #a0aec0;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 32px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .result-card {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .schedule-day {
+            color: #2d3748;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .schedule-time {
+            color: #4a5568;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .schedule-detail {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .address-display {
+            background: #edf2f7;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .error {
+            display: none;
+            background: #fff5f5;
+            border-left: 4px solid #f56565;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .error-title {
+            color: #c53030;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .error-message {
+            color: #742a2a;
+            font-size: 14px;
+        }
+
+        .retry-btn {
+            background: #f56565;
+            margin-top: 12px;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .footer {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            color: #a0aec0;
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .new-search {
+            margin-top: 16px;
+        }
+
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #2c5282;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+        }
+
+        .calendar-emoji {
+            cursor: pointer;
+            font-size: 1.5em;
+            margin-left: 8px;
+            display: inline-block;
+            transition: transform 0.2s ease;
+            vertical-align: middle;
+        }
+
+        .calendar-emoji:hover {
+            transform: scale(1.2);
+        }
+
+        .calendar-emoji:active {
+            transform: scale(1.0);
+        }
+
+        .calendar-actions {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .google-calendar-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .google-calendar-btn:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .google-calendar-btn:active {
+            transform: translateY(0);
+        }
+
+        .ics-link {
+            color: #718096;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+            align-self: center;
+        }
+
+        .ics-link:hover {
+            color: #667eea;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 SF Street Sweeping</h1>
+        <p class="subtitle">Find your next street sweeping schedule</p>
+
+        <div class="info-box">
+            <strong>Add to Calendar:</strong> Google Calendar opens instantly (remember to set reminders). .ics file includes automatic reminders at 6pm the night before + 30 min before.
+        </div>
+
+        <div id="searchForm">
+            <div class="input-group">
+                <label for="address">Street Address</label>
+                <input 
+                    type="text" 
+                    id="address" 
+                    placeholder="Enter your SF address"
+                    autocomplete="off"
+                />
+                <div class="example-text">Example: 565 Clay Street</div>
+            </div>
+            <button id="searchBtn">Find Street Sweeping</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div style="color: #718096;">Searching SF Open Data...</div>
+        </div>
+
+        <div class="error" id="error">
+            <div class="error-title" id="errorTitle">Error</div>
+            <div class="error-message" id="errorMessage"></div>
+            <button class="retry-btn" id="retryBtn">Try Again</button>
+        </div>
+
+        <div class="results" id="results">
+            <div class="address-display" id="addressDisplay"></div>
+            <div id="scheduleList"></div>
+            <button class="new-search" id="newSearchBtn">Search Another Address</button>
+        </div>
+
+        <div class="footer">
+            Data from <a href="https://data.sfgov.org" target="_blank">SF Open Data Portal</a>
+            <br>
+            <small>Always verify with posted street signs</small>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentAddress = '';
+        
+        // DOM Elements
+        const addressInput = document.getElementById('address');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchForm = document.getElementById('searchForm');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const results = document.getElementById('results');
+        const addressDisplay = document.getElementById('addressDisplay');
+        const scheduleList = document.getElementById('scheduleList');
+        const newSearchBtn = document.getElementById('newSearchBtn');
+        const retryBtn = document.getElementById('retryBtn');
+        const errorTitle = document.getElementById('errorTitle');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Event Listeners
+        searchBtn.addEventListener('click', handleSearch);
+        addressInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSearch();
+        });
+        newSearchBtn.addEventListener('click', resetSearch);
+        retryBtn.addEventListener('click', handleSearch);
+
+        // Main search function
+        async function handleSearch() {
+            const address = addressInput.value.trim();
+            
+            if (!address) {
+                showError('Please enter an address', 'Enter a street address to search.');
+                return;
+            }
+
+            currentAddress = address;
+            showLoading();
+
+            try {
+                // Step 1: Query EAS to get CNN
+                console.log('Step 1: Querying EAS for address:', address);
+                const easData = await queryEAS(address);
+                
+                if (!easData || easData.length === 0) {
+                    showError(
+                        'Address not found',
+                        `Could not find "${address}" in SF database. Try including the street number (e.g., "123 Main Street").`
+                    );
+                    return;
+                }
+
+                // Use first/best match
+                const match = easData[0];
+                console.log('EAS match:', match);
+
+                if (!match.cnn) {
+                    showError(
+                        'Missing data',
+                        'This address exists but is missing street segment data (CNN).'
+                    );
+                    return;
+                }
+
+                // Step 2: Query Street Sweeping by CNN
+                console.log('Step 2: Querying street sweeping for CNN:', match.cnn);
+                const sweepingData = await queryStreetSweeping(match.cnn);
+
+                if (!sweepingData || sweepingData.length === 0) {
+                    showResults(match.address || address, []);
+                    return;
+                }
+
+                console.log('Street sweeping data:', sweepingData);
+                
+                // DEBUG: Log each record's details
+                console.log('=== DETAILED STREET SWEEPING DATA ===');
+                sweepingData.forEach((record, i) => {
+                    console.log(`\n--- Record ${i + 1} (ALL FIELDS) ---`);
+                    console.log(record); // Log the entire object
+                    console.log('\nKey fields:');
+                    console.log('  weekday:', record.weekday);
+                    console.log('  fullname:', record.fullname);
+                    console.log('  fromhour:', record.fromhour);
+                    console.log('  tohour:', record.tohour);
+                    console.log('  cnn:', record.cnn);
+                    console.log('  blockside:', record.blockside);
+                });
+                console.log('\nTotal records:', sweepingData.length);
+                console.log('=====================================');
+                
+                showResults(match.address || address, sweepingData);
+
+            } catch (err) {
+                console.error('Error:', err);
+                showError(
+                    'Connection Error',
+                    'Could not connect to SF Open Data. Please check your internet connection and try again.'
+                );
+            }
+        }
+
+        // Query EAS API
+        async function queryEAS(address) {
+            const baseUrl = 'https://data.sfgov.org/resource/3mea-di5p.json';
+            
+            // Clean up address: trim, remove extra spaces
+            let cleanAddress = address.trim().replace(/\s+/g, ' ');
+            
+            // Normalize street abbreviations for better matching
+            const abbreviations = {
+                'street': 'st',
+                'avenue': 'ave',
+                'boulevard': 'blvd',
+                'drive': 'dr',
+                'road': 'rd',
+                'lane': 'ln',
+                'court': 'ct',
+                'place': 'pl',
+                'way': 'way',
+                'circle': 'cir',
+                'terrace': 'ter'
+            };
+            
+            // Try to expand common abbreviations in user input
+            let searchAddress = cleanAddress.toLowerCase();
+            Object.entries(abbreviations).forEach(([full, abbr]) => {
+                // Replace full form with abbreviation for searching
+                searchAddress = searchAddress.replace(new RegExp(`\\b${full}\\b`, 'g'), abbr);
+            });
+            
+            // Use simple search parameter instead of SQL WHERE clause
+            const query = `?$q=${encodeURIComponent(searchAddress)}&$limit=20`;
+            const url = baseUrl + query;
+            
+            console.log('EAS URL:', url);
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`EAS API error: ${response.status}`);
+            }
+            
+            const results = await response.json();
+            
+            console.log(`API returned ${results.length} results`);
+            
+            // Build normalized search address for exact matching
+            // Format: "NUMBER STREETNAME ABBREVIATION" (e.g., "191 HAIGHT ST")
+            const normalizedSearch = searchAddress.toUpperCase();
+            
+            console.log('Looking for exact match:', normalizedSearch);
+            
+            // Find exact match on the address field
+            const exactMatches = results.filter(r => {
+                if (!r.address) return false;
+                
+                // Normalize the database address the same way
+                const dbAddressNormalized = r.address.toUpperCase();
+                
+                console.log('Comparing:', normalizedSearch, 'vs', dbAddressNormalized);
+                
+                return dbAddressNormalized === normalizedSearch;
+            });
+            
+            if (exactMatches.length > 0) {
+                console.log(`Found ${exactMatches.length} exact match(es)`);
+                return exactMatches;
+            }
+            
+            // If no exact match, fall back to partial matching
+            // (in case user input doesn't match database format exactly)
+            console.log('No exact match, trying partial match...');
+            
+            const addressParts = searchAddress.split(' ');
+            const userNumber = addressParts.find(part => /^\d+$/.test(part));
+            
+            const partialMatches = results.filter(r => {
+                if (!r.address) return false;
+                const dbAddress = r.address.toLowerCase();
+                
+                // Must contain street number
+                if (userNumber && !dbAddress.includes(userNumber)) return false;
+                
+                // Get street name (exclude number and common abbreviations)
+                const commonAbbrs = ['st', 'ave', 'blvd', 'dr', 'rd', 'ln', 'ct', 'pl', 'way', 'cir', 'ter'];
+                const streetNameParts = addressParts.filter(p => 
+                    p.length > 1 && !/^\d+$/.test(p) && !commonAbbrs.includes(p)
+                );
+                
+                if (streetNameParts.length === 0) return true;
+                
+                // All street name parts must match
+                return streetNameParts.every(part => dbAddress.includes(part));
+            });
+            
+            console.log(`Found ${partialMatches.length} partial matches`);
+            if (partialMatches.length > 0) {
+                console.log('Top 3 partial matches:', partialMatches.slice(0, 3).map(r => r.address));
+            }
+            
+            return partialMatches;
+        }
+
+        // Query Street Sweeping API
+        async function queryStreetSweeping(cnn) {
+            const baseUrl = 'https://data.sfgov.org/resource/yhqp-riqs.json';
+            const url = `${baseUrl}?cnn=${cnn}`;
+            
+            console.log('Street Sweeping URL:', url);
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`Street Sweeping API error: ${response.status}`);
+            }
+            
+            return await response.json();
+        }
+
+        // Show results
+        function showResults(address, schedules) {
+            hideLoading();
+            hideError();
+            searchForm.style.display = 'none';
+            
+            addressDisplay.textContent = `📍 ${address}`;
+            
+            if (schedules.length === 0) {
+                scheduleList.innerHTML = `
+                    <div class="result-card">
+                        <div class="schedule-day">No Street Sweeping Scheduled</div>
+                        <div class="schedule-detail">
+                            This location does not have scheduled mechanical street sweeping.
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Process and display schedules
+                const processedSchedules = processSchedules(schedules);
+                
+                let html = '';
+                
+                html += processedSchedules.map((schedule, index) => 
+                    createScheduleCard(schedule, index === 0, address)
+                ).join('');
+                
+                scheduleList.innerHTML = html;
+                
+                // Add click handlers for Google Calendar buttons
+                document.querySelectorAll('.google-calendar-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const scheduleId = this.getAttribute('data-schedule-id');
+                        const data = window.scheduleData[scheduleId];
+                        if (data) {
+                            openGoogleCalendar(data.schedule, data.address);
+                        }
+                    });
+                });
+                
+                // Add click handlers for .ics download links
+                document.querySelectorAll('.ics-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const scheduleId = this.getAttribute('data-schedule-id');
+                        const data = window.scheduleData[scheduleId];
+                        if (data) {
+                            generateCalendarEvent(data.schedule, data.address);
+                        }
+                    });
+                });
+            }
+            
+            results.classList.add('active');
+        }
+
+        // Process schedule data
+        function processSchedules(schedules) {
+            // Group by day + blockside
+            const grouped = {};
+            
+            schedules.forEach(s => {
+                // Use weekday for grouping, not fullname (which may include pattern)
+                const day = s.weekday || 'Unknown';
+                const side = s.blockside || 'Unknown Side';
+                const key = `${day}|${side}`;
+                
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        day: day,
+                        side: side,
+                        weekday: s.weekday,
+                        times: [],
+                        // Preserve week fields
+                        week1: s.week1,
+                        week2: s.week2,
+                        week3: s.week3,
+                        week4: s.week4,
+                        week5: s.week5
+                    };
+                }
+                
+                grouped[key].times.push({
+                    from: parseInt(s.fromhour) || 0,
+                    to: parseInt(s.tohour) || 0,
+                    fromStr: s.fromhour,
+                    toStr: s.tohour
+                });
+            });
+            
+            // Convert to array and combine adjacent times
+            const processed = Object.values(grouped).map(group => {
+                // Sort times
+                group.times.sort((a, b) => a.from - b.from);
+                
+                // Combine times into display string
+                const timeRanges = group.times.map(t => 
+                    `${formatTimeSimple(t.fromStr)}-${formatTimeSimple(t.toStr)}`
+                ).join(', ');
+                
+                return {
+                    ...group,
+                    timeDisplay: timeRanges,
+                    // For sorting
+                    primaryDay: group.weekday || group.day?.substring(0, 3) || ''
+                };
+            });
+            
+            // Sort by weekday
+            const dayOrder = {
+                'Mon': 1, 'Monday': 1,
+                'Tue': 2, 'Tuesday': 2, 
+                'Tues': 2,
+                'Wed': 3, 'Wednesday': 3, 
+                'Thu': 4, 'Thursday': 4, 
+                'Fri': 5, 'Friday': 5, 
+                'Sat': 6, 'Saturday': 6, 
+                'Sun': 7, 'Sunday': 7
+            };
+            
+            processed.sort((a, b) => {
+                const dayA = a.primaryDay;
+                const dayB = b.primaryDay;
+                return (dayOrder[dayA] || 999) - (dayOrder[dayB] || 999);
+            });
+            
+            // Calculate next occurrence for each
+            const withDates = processed.map(s => {
+                const weekFields = {
+                    week1: s.week1,
+                    week2: s.week2,
+                    week3: s.week3,
+                    week4: s.week4,
+                    week5: s.week5
+                };
+                
+                return {
+                    ...s,
+                    nextDate: calculateNextOccurrence(s.weekday, s.times[0]?.fromStr, null, weekFields)
+                };
+            });
+            
+            // Sort by actual next date (soonest first)
+            withDates.sort((a, b) => {
+                const dateA = a.nextDate?.actualDate;
+                const dateB = b.nextDate?.actualDate;
+                
+                if (!dateA && !dateB) return 0;
+                if (!dateA) return 1;
+                if (!dateB) return -1;
+                
+                return dateA - dateB;
+            });
+            
+            return withDates;
+        }
+        
+        // Simple time formatter (8am instead of 8:00 AM)
+        function formatTimeSimple(timeStr) {
+            if (!timeStr) return '';
+            const hour = parseInt(timeStr);
+            if (isNaN(hour)) return timeStr;
+            
+            if (hour === 0) return '12am';
+            if (hour < 12) return `${hour}am`;
+            if (hour === 12) return '12pm';
+            return `${hour - 12}pm`;
+        }
+
+        // Calculate next occurrence
+        function calculateNextOccurrence(weekday, time, fullname, weekFields) {
+            // Extract day from fullname if available (e.g., "Mon 2nd & 4th" -> "Mon")
+            let day = weekday;
+            if (!day && fullname) {
+                const match = fullname.match(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)/i);
+                if (match) day = match[1];
+            }
+            
+            if (!day) return null;
+            
+            const dayMap = {
+                'Mon': 'Monday', 'Monday': 'Monday',
+                'Tue': 'Tuesday', 'Tues': 'Tuesday', 'Tuesday': 'Tuesday',
+                'Wed': 'Wednesday', 'Wednesday': 'Wednesday',
+                'Thu': 'Thursday', 'Thur': 'Thursday', 'Thurs': 'Thursday', 'Thursday': 'Thursday',
+                'Fri': 'Friday', 'Friday': 'Friday',
+                'Sat': 'Saturday', 'Saturday': 'Saturday',
+                'Sun': 'Sunday', 'Sunday': 'Sunday'
+            };
+            
+            const fullDay = dayMap[day] || day;
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const targetDay = days.indexOf(fullDay);
+            
+            if (targetDay === -1) return null;
+            
+            const today = new Date();
+            
+            // Check which weeks have sweeping using Week1-Week5 fields
+            if (weekFields) {
+                const activeWeeks = [];
+                for (let i = 1; i <= 5; i++) {
+                    if (weekFields[`week${i}`] === "1") {
+                        activeWeeks.push(i);
+                    }
+                }
+                
+                // If not all 5 weeks, it's a specific week pattern
+                if (activeWeeks.length > 0 && activeWeeks.length < 5) {
+                    // Find next occurrence in active weeks
+                    const nextDate = findNextWeekOccurrence(targetDay, activeWeeks, today);
+                    
+                    // Build pattern description
+                    const weekNames = {1: '1st', 2: '2nd', 3: '3rd', 4: '4th', 5: '5th'};
+                    const pattern = activeWeeks.map(w => weekNames[w]).join(' & ');
+                    
+                    if (nextDate) {
+                        return {
+                            date: nextDate,
+                            actualDate: nextDate,
+                            formatted: `${day} ${pattern}`,
+                            pattern: pattern
+                        };
+                    }
+                }
+            }
+            
+            // Simple weekly schedule (all 5 weeks or no week info)
+            const currentDay = today.getDay();
+            let daysUntil = targetDay - currentDay;
+            if (daysUntil < 0) daysUntil += 7;
+            if (daysUntil === 0) {
+                // Check if time has passed today
+                if (time) {
+                    const hours = parseInt(time.split(':')[0]);
+                    if (hours <= today.getHours()) {
+                        daysUntil = 7;
+                    }
+                }
+            }
+            
+            const nextDate = new Date(today);
+            nextDate.setDate(today.getDate() + daysUntil);
+            
+            return {
+                date: nextDate,
+                actualDate: nextDate,
+                daysUntil: daysUntil,
+                formatted: formatDate(nextDate, daysUntil)
+            };
+        }
+
+        // Find next occurrence of a specific weekday in specified weeks of month
+        function findNextWeekOccurrence(targetDay, weeks, fromDate) {
+            const today = new Date(fromDate);
+            
+            // Check this month and next month
+            for (let monthOffset = 0; monthOffset <= 1; monthOffset++) {
+                const checkDate = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
+                
+                for (const weekNum of weeks) {
+                    // Find the Nth occurrence of targetDay in this month
+                    let occurrenceCount = 0;
+                    const daysInMonth = new Date(checkDate.getFullYear(), checkDate.getMonth() + 1, 0).getDate();
+                    
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const testDate = new Date(checkDate.getFullYear(), checkDate.getMonth(), day);
+                        
+                        if (testDate.getDay() === targetDay) {
+                            occurrenceCount++;
+                            
+                            if (occurrenceCount === weekNum && testDate > today) {
+                                return testDate;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return null;
+        }
+
+        // Format date
+        function formatDate(date, daysUntil) {
+            if (daysUntil === 0) return 'Today';
+            if (daysUntil === 1) return 'Tomorrow';
+            if (daysUntil <= 6) return `In ${daysUntil} days`;
+            
+            const options = { month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Create schedule card HTML
+        function createScheduleCard(schedule, isNext, address) {
+            // Build display day
+            let displayDay = schedule.weekday || schedule.day || 'Unknown day';
+            
+            // Add pattern from week fields if it exists
+            if (schedule.nextDate && schedule.nextDate.pattern) {
+                displayDay = `${displayDay} (${schedule.nextDate.pattern})`;
+            }
+            
+            const side = schedule.side && schedule.side !== 'Unknown Side' ? ` - ${schedule.side} side` : '';
+            const timeDisplay = schedule.timeDisplay || 'Time unknown';
+            
+            // Build the "next date" text
+            let nextText = '';
+            if (schedule.nextDate && schedule.nextDate.actualDate) {
+                const dateStr = schedule.nextDate.actualDate.toLocaleDateString('en-US', { 
+                    weekday: 'short', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                nextText = `Next: ${dateStr}`;
+            } else {
+                nextText = `Schedule: ${displayDay}`;
+            }
+            
+            // Add calendar button inline with next date
+            const scheduleId = `schedule_${Date.now()}_${Math.random()}`;
+            window.scheduleData = window.scheduleData || {};
+            window.scheduleData[scheduleId] = { schedule, address };
+            
+            return `
+                <div class="result-card">
+                    <div class="schedule-day">${displayDay}${side}</div>
+                    <div class="schedule-time">${timeDisplay}</div>
+                    <div class="schedule-detail">
+                        ${nextText}
+                    </div>
+                    <div class="calendar-actions">
+                        <button class="google-calendar-btn" data-schedule-id="${scheduleId}">
+                            📅 Add to Google Calendar
+                        </button>
+                        <a href="#" class="ics-link" data-schedule-id="${scheduleId}">Download .ics file</a>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Format time
+        function formatTime(timeStr) {
+            if (!timeStr || timeStr === 'Unknown') return timeStr;
+            
+            // Handle HH:MM format
+            const [hours, minutes] = timeStr.split(':');
+            const hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+            
+            return `${displayHour}:${minutes || '00'} ${ampm}`;
+        }
+
+        // UI State Functions
+        function showLoading() {
+            searchBtn.disabled = true;
+            loading.classList.add('active');
+            hideError();
+            hideResults();
+        }
+
+        function hideLoading() {
+            searchBtn.disabled = false;
+            loading.classList.remove('active');
+        }
+
+        function showError(title, message) {
+            hideLoading();
+            hideResults();
+            errorTitle.textContent = title;
+            errorMessage.textContent = message;
+            error.classList.add('active');
+        }
+
+        function hideError() {
+            error.classList.remove('active');
+        }
+
+        function hideResults() {
+            results.classList.remove('active');
+        }
+
+        function resetSearch() {
+            searchForm.style.display = 'block';
+            hideResults();
+            hideError();
+            addressInput.value = '';
+            addressInput.focus();
+        }
+
+        // Add side selector for choosing which side to get reminder for
+        // Open Google Calendar with pre-filled event
+        function openGoogleCalendar(schedule, address) {
+            if (!schedule.nextDate?.actualDate) {
+                alert('Cannot create calendar event - no valid date found.');
+                return;
+            }
+            
+            const eventDate = new Date(schedule.nextDate.actualDate);
+            const dayName = schedule.day || schedule.weekday || 'Street Sweeping';
+            const sideName = schedule.side !== 'Unknown Side' ? ` (${schedule.side} side)` : '';
+            const timeRange = schedule.timeDisplay || '';
+            
+            // Parse start time from schedule
+            const startTimeStr = schedule.times?.[0]?.fromStr || '8';
+            const endTimeStr = schedule.times?.[0]?.toStr || '10';
+            const startHour = parseInt(startTimeStr);
+            const endHour = parseInt(endTimeStr);
+            
+            // Set event times
+            const eventStart = new Date(eventDate);
+            eventStart.setHours(startHour, 0, 0, 0);
+            
+            const eventEnd = new Date(eventDate);
+            eventEnd.setHours(endHour, 0, 0, 0);
+            
+            // Format dates for Google Calendar (YYYYMMDDTHHMMSS)
+            const formatGoogleDate = (date) => {
+                const pad = (n) => n.toString().padStart(2, '0');
+                return date.getFullYear() + 
+                       pad(date.getMonth() + 1) + 
+                       pad(date.getDate()) + 
+                       'T' + 
+                       pad(date.getHours()) + 
+                       pad(date.getMinutes()) + 
+                       pad(date.getSeconds());
+            };
+            
+            // Build Google Calendar URL
+            const params = new URLSearchParams({
+                action: 'TEMPLATE',
+                text: 'Move Car - Street Sweeping',
+                dates: `${formatGoogleDate(eventStart)}/${formatGoogleDate(eventEnd)}`,
+                details: `Street sweeping at ${address}${sideName}\nTime: ${timeRange}\n\n⚠️ Don't forget to set reminders! Suggested:\n• 6pm the night before\n• 30 minutes before\n\nRemember to move your car before sweeping starts!`,
+                location: address
+            });
+            
+            const googleCalendarUrl = `https://calendar.google.com/calendar/render?${params.toString()}`;
+            
+            // Open in new window/tab
+            window.open(googleCalendarUrl, '_blank');
+            
+            // Show success message
+            showSuccessMessage('Opening Google Calendar...');
+        }
+
+        // Generate and download .ics calendar file
+        function generateCalendarEvent(schedule, address) {
+            if (!schedule.nextDate?.actualDate) {
+                alert('Cannot create calendar event - no valid date found.');
+                return;
+            }
+            
+            const eventDate = new Date(schedule.nextDate.actualDate);
+            const dayName = schedule.day || schedule.weekday || 'Street Sweeping';
+            const sideName = schedule.side !== 'Unknown Side' ? ` (${schedule.side} side)` : '';
+            const timeRange = schedule.timeDisplay || '';
+            
+            // Parse start time from schedule
+            const startTimeStr = schedule.times?.[0]?.fromStr || '8';
+            const startHour = parseInt(startTimeStr);
+            
+            // Set event time to the start of sweeping
+            const eventStart = new Date(eventDate);
+            eventStart.setHours(startHour, 0, 0, 0);
+            
+            // End time (2 hours duration as placeholder)
+            const eventEnd = new Date(eventStart);
+            eventEnd.setHours(startHour + 2, 0, 0, 0);
+            
+            // Reminder 1: 6pm the night before
+            const reminder1 = new Date(eventDate);
+            reminder1.setDate(reminder1.getDate() - 1);
+            reminder1.setHours(18, 0, 0, 0);
+            const reminder1Minutes = Math.floor((eventStart - reminder1) / 1000 / 60);
+            
+            // Reminder 2: 30 minutes before
+            const reminder2Minutes = 30;
+            
+            // Format dates for iCalendar (YYYYMMDDTHHMMSS)
+            const formatICalDate = (date) => {
+                const pad = (n) => n.toString().padStart(2, '0');
+                return date.getFullYear() + 
+                       pad(date.getMonth() + 1) + 
+                       pad(date.getDate()) + 
+                       'T' + 
+                       pad(date.getHours()) + 
+                       pad(date.getMinutes()) + 
+                       pad(date.getSeconds());
+            };
+            
+            const now = new Date();
+            const icsContent = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//SF Street Sweeping//EN',
+                'CALSCALE:GREGORIAN',
+                'METHOD:PUBLISH',
+                'BEGIN:VEVENT',
+                `UID:${Date.now()}@sf-street-sweeping`,
+                `DTSTAMP:${formatICalDate(now)}`,
+                `DTSTART:${formatICalDate(eventStart)}`,
+                `DTEND:${formatICalDate(eventEnd)}`,
+                `SUMMARY:Move Car - Street Sweeping`,
+                `DESCRIPTION:Street sweeping at ${address}${sideName}\\nTime: ${timeRange}\\n\\nRemember to move your car before sweeping starts!`,
+                `LOCATION:${address}`,
+                `BEGIN:VALARM`,
+                `TRIGGER:-PT${reminder1Minutes}M`,
+                'ACTION:DISPLAY',
+                `DESCRIPTION:Street sweeping tomorrow at ${address}`,
+                'END:VALARM',
+                'BEGIN:VALARM',
+                `TRIGGER:-PT${reminder2Minutes}M`,
+                'ACTION:DISPLAY',
+                `DESCRIPTION:Street sweeping in 30 minutes at ${address}`,
+                'END:VALARM',
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\r\n');
+            
+            // Create blob and download
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `street-sweeping-${address.replace(/\s+/g, '-')}.ics`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success message
+            showSuccessMessage();
+        }
+
+        // Show success message after calendar action
+        function showSuccessMessage(text = '✅ Calendar event downloaded! Open it to add to your calendar.') {
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #48bb78;
+                color: white;
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                font-weight: 600;
+                z-index: 1000;
+                animation: slideDown 0.3s ease-out;
+            `;
+            message.textContent = text;
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.style.animation = 'slideUp 0.3s ease-out';
+                setTimeout(() => message.remove(), 300);
+            }, 3000);
+        }
+
+        // Focus on input on load
+        addressInput.focus();
+    </script>
+</body>
+</html>
