@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SF Street Sweeping - Find My Location</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #faf8f3;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .header {
+            background: #4a7c59;
+            padding: 24px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 28px;
+            margin: 0 0 8px 0;
+        }
+
+        .header .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        .gps-button {
+            width: 100%;
+            background: #5a8a5a;
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .gps-button:hover {
+            background: #6b9b6b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .gps-button:disabled {
+            background: #9a9a8a;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            text-align: center;
+            color: #9a9a8a;
+            font-size: 14px;
+            margin: 24px 0;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #d4d0c4;
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        .manual-toggle {
+            background: none;
+            border: none;
+            color: #6b7254;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px;
+            width: 100%;
+            transition: color 0.2s;
+        }
+
+        .manual-toggle:hover {
+            color: #4a7c59;
+        }
+
+        .manual-section {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .manual-section.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #3e4234;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #d4d0c4;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+            background: white;
+            color: #3e4234;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #5a8a5a;
+        }
+
+        .input-group input::placeholder {
+            color: #9a9a8a;
+        }
+
+        .search-btn {
+            width: 100%;
+            background: #5a8a5a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-btn:hover {
+            background: #6b9b6b;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Loading state */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #d4d0c4;
+            border-top-color: #5a8a5a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #6b7254;
+            font-size: 14px;
+        }
+
+        /* Results */
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .detected-address {
+            background: transparent;
+            padding: 0 0 16px 0;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e8e6df;
+        }
+
+        .detected-address .label {
+            color: #6b7254;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .detected-address .address {
+            color: #3e4234;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .detected-address .edit-link {
+            color: #5a8a5a;
+            font-size: 13px;
+            text-decoration: none;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .detected-address .edit-link:hover {
+            color: #4a7c59;
+            text-decoration: underline;
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+
+        .schedule-day {
+            color: #3e4234;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .schedule-time {
+            color: #5a5742;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .schedule-detail {
+            color: #6b7254;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .calendar-actions {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .google-calendar-btn {
+            background: #5a8a5a;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .google-calendar-btn:hover {
+            background: #6b9b6b;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .ics-link {
+            color: #6b7254;
+            font-size: 13px;
+            text-decoration: none;
+            text-align: center;
+            transition: color 0.2s;
+        }
+
+        .ics-link:hover {
+            color: #5a8a5a;
+            text-decoration: underline;
+        }
+
+        .new-search-btn {
+            width: 100%;
+            background: transparent;
+            border: 2px solid #d4d0c4;
+            color: #5a8a5a;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 24px;
+        }
+
+        .new-search-btn:hover {
+            border-color: #5a8a5a;
+            background: #f5f3ed;
+        }
+
+        .error-message {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 24px;
+            color: #856404;
+        }
+
+        .error-message strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .info-box {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: #2e7d32;
+            line-height: 1.5;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧹 SF Street Sweeping</h1>
+        <p class="subtitle">Never forget to move your car</p>
+    </div>
+
+    <div class="container">
+        <!-- Screen 1: Landing -->
+        <div id="screen1" class="screen active">
+            <button class="gps-button" id="gpsButton" onclick="findMyLocation()">
+                📍 Find My Location With GPS
+            </button>
+
+            <div class="divider">or</div>
+
+            <button class="manual-toggle" onclick="toggleManual()">
+                Enter address manually ▼
+            </button>
+
+            <div id="manualSection" class="manual-section">
+                <div class="input-group">
+                    <label for="addressInput">Street Address</label>
+                    <input 
+                        type="text" 
+                        id="addressInput" 
+                        placeholder="e.g., 191 Haight Street"
+                        onkeypress="if(event.key === 'Enter') searchAddress()"
+                    >
+                </div>
+                <button class="search-btn" onclick="searchAddress()">Search</button>
+            </div>
+        </div>
+
+        <!-- Screen 2: Loading -->
+        <div id="screen2" class="screen">
+            <div class="loading active">
+                <div class="spinner"></div>
+                <div class="loading-text" id="loadingText">Getting your location...</div>
+            </div>
+        </div>
+
+        <!-- Screen 3: Results -->
+        <div id="screen3" class="screen">
+            <div class="detected-address">
+                <div class="label" id="addressLabel">📍 Detected Location</div>
+                <div class="address" id="detectedAddress"></div>
+                <a class="edit-link" onclick="backToSearch()">Use different location</a>
+            </div>
+
+            <div class="info-box">
+                <strong>Add to Calendar:</strong> Google Calendar opens instantly (remember to set reminders). .ics file includes automatic reminders at 6pm the night before + 30 min before.
+            </div>
+
+            <div id="scheduleList"></div>
+
+            <button class="new-search-btn" onclick="backToSearch()">Use Different Location</button>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentAddress = '';
+        window.scheduleData = {};
+
+        // Toggle manual entry section
+        function toggleManual() {
+            const section = document.getElementById('manualSection');
+            const btn = document.querySelector('.manual-toggle');
+            section.classList.toggle('active');
+            btn.textContent = section.classList.contains('active') 
+                ? 'Hide manual entry ▲' 
+                : 'Enter address manually ▼';
+        }
+
+        // Get current GPS location
+        async function findMyLocation() {
+            const btn = document.getElementById('gpsButton');
+            btn.disabled = true;
+            btn.textContent = '📍 Getting location...';
+
+            showScreen('screen2');
+            setLoadingText('Getting your location...');
+
+            try {
+                // Get GPS coordinates
+                const position = await getCurrentPosition();
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                setLoadingText('Finding your address...');
+
+                // Reverse geocode to get address
+                const address = await reverseGeocode(lat, lng);
+
+                if (!address) {
+                    throw new Error('Could not determine address from GPS location');
+                }
+
+                // Search for street sweeping at this address
+                await performSearch(address, true);
+
+            } catch (error) {
+                console.error('GPS Error:', error);
+                showError(error.message || 'Could not get your location');
+                backToSearch();
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📍 Find My Location With GPS';
+            }
+        }
+
+        // Get GPS position (promisified)
+        function getCurrentPosition() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('GPS not supported by your browser'));
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    position => resolve(position),
+                    error => {
+                        let message = 'Could not get your location';
+                        if (error.code === 1) {
+                            message = 'Location access denied. Please enable location in your browser settings.';
+                        } else if (error.code === 2) {
+                            message = 'Location unavailable. Please check your GPS settings.';
+                        } else if (error.code === 3) {
+                            message = 'Location request timed out. Please try again.';
+                        }
+                        reject(new Error(message));
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            });
+        }
+
+        // Reverse geocode using Nominatim (OpenStreetMap)
+        async function reverseGeocode(lat, lng) {
+            try {
+                const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+                const response = await fetch(url, {
+                    headers: {
+                        'User-Agent': 'SF Street Sweeping App'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Geocoding service unavailable');
+                }
+
+                const data = await response.json();
+
+                // Check if we're in San Francisco
+                const city = data.address?.city || data.address?.town || data.address?.village || '';
+                if (!city.toLowerCase().includes('san francisco')) {
+                    throw new Error('You appear to be outside San Francisco. This app only works for SF addresses.');
+                }
+
+                // Extract street address
+                const houseNumber = data.address?.house_number || '';
+                const road = data.address?.road || '';
+
+                if (!road) {
+                    throw new Error('Could not determine street address from your location');
+                }
+
+                const address = houseNumber ? `${houseNumber} ${road}` : road;
+                return address;
+
+            } catch (error) {
+                console.error('Reverse geocoding error:', error);
+                throw error;
+            }
+        }
+
+        // Manual address search
+        async function searchAddress() {
+            const input = document.getElementById('addressInput');
+            const address = input.value.trim();
+
+            if (!address) {
+                showError('Please enter an address');
+                return;
+            }
+
+            showScreen('screen2');
+            setLoadingText('Searching for address...');
+
+            await performSearch(address, false);
+        }
+
+        // Perform street sweeping search
+        async function performSearch(address, isGPS) {
+            try {
+                currentAddress = address;
+
+                // First get CNN from EAS API
+                const cnn = await getCNN(address);
+
+                if (!cnn) {
+                    throw new Error('Address not found in San Francisco database. Please try a different address or check the spelling.');
+                }
+
+                // Then get street sweeping data
+                const schedules = await getStreetSweeping(cnn);
+
+                if (!schedules || schedules.length === 0) {
+                    throw new Error('No street sweeping schedules found for this address.');
+                }
+
+                // Show results
+                displayResults(address, schedules, isGPS);
+
+            } catch (error) {
+                console.error('Search error:', error);
+                showError(error.message || 'An error occurred while searching');
+                backToSearch();
+            }
+        }
+
+        // Get CNN from EAS API
+        async function getCNN(searchAddress) {
+            const url = 'https://data.sfgov.org/resource/ddk6-kvux.json';
+            const normalizedSearch = normalizeAddress(searchAddress);
+            
+            const response = await fetch(`${url}?$limit=50`);
+            const data = await response.json();
+            
+            // Try exact match first
+            for (const item of data) {
+                const dbAddress = normalizeAddress(item.address || '');
+                if (dbAddress === normalizedSearch) {
+                    return item.cnn;
+                }
+            }
+            
+            // Try partial match
+            const searchParts = normalizedSearch.split(' ');
+            const searchNumber = searchParts[0];
+            
+            for (const item of data) {
+                const dbAddress = normalizeAddress(item.address || '');
+                const dbParts = dbAddress.split(' ');
+                const dbNumber = dbParts[0];
+                
+                if (searchNumber === dbNumber && searchParts.slice(1).every(part => dbParts.includes(part))) {
+                    return item.cnn;
+                }
+            }
+            
+            return null;
+        }
+
+        // Normalize address for matching
+        function normalizeAddress(address) {
+            const abbreviations = {
+                'street': 'st', 'avenue': 'ave', 'boulevard': 'blvd',
+                'drive': 'dr', 'road': 'rd', 'lane': 'ln', 'court': 'ct',
+                'place': 'pl', 'terrace': 'ter', 'way': 'way'
+            };
+            
+            let normalized = address.toLowerCase().trim();
+            Object.entries(abbreviations).forEach(([full, abbr]) => {
+                normalized = normalized.replace(new RegExp(`\\b${full}\\b`, 'g'), abbr);
+            });
+            
+            return normalized;
+        }
+
+        // Get street sweeping schedules
+        async function getStreetSweeping(cnn) {
+            const url = `https://data.sfgov.org/resource/yhqp-riqs.json?cnn=${cnn}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            return processSchedules(data);
+        }
+
+        // Process and group schedules
+        function processSchedules(data) {
+            const grouped = {};
+            
+            data.forEach(item => {
+                const weekday = item.weekday || 'Unknown';
+                const corridor = item.corridor || 'Unknown';
+                const key = `${weekday}-${corridor}`;
+                
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        day: weekday,
+                        side: corridor.includes('LF') ? 'Left side' : 
+                              corridor.includes('RT') ? 'Right side' :
+                              corridor.includes('North') ? 'North side' :
+                              corridor.includes('South') ? 'South side' :
+                              corridor.includes('East') ? 'East side' :
+                              corridor.includes('West') ? 'West side' : 'Unknown Side',
+                        times: [],
+                        weeks: {
+                            week1: item.week1,
+                            week2: item.week2,
+                            week3: item.week3,
+                            week4: item.week4,
+                            week5: item.week5
+                        }
+                    };
+                }
+                
+                if (item.fromhour && item.tohour) {
+                    grouped[key].times.push({
+                        fromStr: item.fromhour,
+                        toStr: item.tohour,
+                        from: parseInt(item.fromhour),
+                        to: parseInt(item.tohour)
+                    });
+                }
+            });
+            
+            // Calculate next occurrence for each schedule
+            Object.values(grouped).forEach(schedule => {
+                schedule.nextDate = calculateNextOccurrence(schedule);
+                schedule.timeDisplay = formatTimeRange(schedule.times);
+                schedule.pattern = getWeekPattern(schedule.weeks);
+            });
+            
+            // Sort by next occurrence
+            return Object.values(grouped).sort((a, b) => {
+                if (!a.nextDate?.actualDate) return 1;
+                if (!b.nextDate?.actualDate) return -1;
+                return new Date(a.nextDate.actualDate) - new Date(b.nextDate.actualDate);
+            });
+        }
+
+        // Calculate next occurrence
+        function calculateNextOccurrence(schedule) {
+            const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const targetDay = daysOfWeek.indexOf(schedule.day);
+            
+            if (targetDay === -1) return null;
+            
+            const activeWeeks = [];
+            for (let i = 1; i <= 5; i++) {
+                if (schedule.weeks[`week${i}`] === "1") {
+                    activeWeeks.push(i);
+                }
+            }
+            
+            if (activeWeeks.length === 0) return null;
+            
+            const today = new Date();
+            let checkDate = new Date(today);
+            
+            for (let i = 0; i < 60; i++) {
+                if (checkDate.getDay() === targetDay) {
+                    const weekOfMonth = Math.ceil(checkDate.getDate() / 7);
+                    if (activeWeeks.includes(weekOfMonth)) {
+                        return {
+                            date: checkDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+                            actualDate: new Date(checkDate)
+                        };
+                    }
+                }
+                checkDate.setDate(checkDate.getDate() + 1);
+            }
+            
+            return null;
+        }
+
+        // Format time range
+        function formatTimeRange(times) {
+            if (!times || times.length === 0) return 'Time not specified';
+            
+            times.sort((a, b) => a.from - b.from);
+            const first = times[0];
+            const last = times[times.length - 1];
+            
+            const formatHour = (hour) => {
+                const h = parseInt(hour);
+                if (h === 0) return '12am';
+                if (h < 12) return h + 'am';
+                if (h === 12) return '12pm';
+                return (h - 12) + 'pm';
+            };
+            
+            return `${formatHour(first.fromStr)}-${formatHour(last.toStr)}`;
+        }
+
+        // Get week pattern
+        function getWeekPattern(weeks) {
+            const activeWeeks = [];
+            const weekNames = ['', '1st', '2nd', '3rd', '4th', '5th'];
+            
+            for (let i = 1; i <= 5; i++) {
+                if (weeks[`week${i}`] === "1") {
+                    activeWeeks.push(i);
+                }
+            }
+            
+            if (activeWeeks.length === 5) return '';
+            if (activeWeeks.length === 0) return '';
+            
+            return ' (' + activeWeeks.map(w => weekNames[w]).join(' & ') + ')';
+        }
+
+        // Display results
+        function displayResults(address, schedules, isGPS) {
+            document.getElementById('detectedAddress').textContent = address.toUpperCase();
+            document.getElementById('addressLabel').textContent = isGPS ? '📍 Detected Location' : '📍 Your Address';
+            
+            const scheduleList = document.getElementById('scheduleList');
+            scheduleList.innerHTML = '';
+            
+            schedules.forEach((schedule, index) => {
+                const scheduleId = `schedule_${Date.now()}_${index}`;
+                window.scheduleData[scheduleId] = { schedule, address };
+                
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                
+                const dayDisplay = schedule.day || 'Unknown day';
+                const sideDisplay = schedule.side !== 'Unknown Side' ? ` - ${schedule.side}` : '';
+                const nextText = schedule.nextDate?.date ? `Next: ${schedule.nextDate.date}` : 'Next occurrence not found';
+                
+                card.innerHTML = `
+                    <div class="schedule-day">${dayDisplay}${sideDisplay}</div>
+                    <div class="schedule-time">${schedule.timeDisplay}${schedule.pattern}</div>
+                    <div class="schedule-detail">${nextText}</div>
+                    <div class="calendar-actions">
+                        <button class="google-calendar-btn" data-schedule-id="${scheduleId}">
+                            📅 Add to Google Calendar
+                        </button>
+                        <a href="#" class="ics-link" data-schedule-id="${scheduleId}">Download .ics file</a>
+                    </div>
+                `;
+                
+                scheduleList.appendChild(card);
+            });
+            
+            // Add event listeners
+            document.querySelectorAll('.google-calendar-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const scheduleId = this.getAttribute('data-schedule-id');
+                    const data = window.scheduleData[scheduleId];
+                    if (data) {
+                        openGoogleCalendar(data.schedule, data.address);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.ics-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const scheduleId = this.getAttribute('data-schedule-id');
+                    const data = window.scheduleData[scheduleId];
+                    if (data) {
+                        generateCalendarEvent(data.schedule, data.address);
+                    }
+                });
+            });
+            
+            showScreen('screen3');
+        }
+
+        // Open Google Calendar with pre-filled event
+        function openGoogleCalendar(schedule, address) {
+            if (!schedule.nextDate?.actualDate) {
+                alert('Cannot create calendar event - no valid date found.');
+                return;
+            }
+            
+            const eventDate = new Date(schedule.nextDate.actualDate);
+            const dayName = schedule.day || schedule.weekday || 'Street Sweeping';
+            const sideName = schedule.side !== 'Unknown Side' ? ` (${schedule.side} side)` : '';
+            const timeRange = schedule.timeDisplay || '';
+            
+            const startTimeStr = schedule.times?.[0]?.fromStr || '8';
+            const endTimeStr = schedule.times?.[0]?.toStr || '10';
+            const startHour = parseInt(startTimeStr);
+            const endHour = parseInt(endTimeStr);
+            
+            const eventStart = new Date(eventDate);
+            eventStart.setHours(startHour, 0, 0, 0);
+            
+            const eventEnd = new Date(eventDate);
+            eventEnd.setHours(endHour, 0, 0, 0);
+            
+            const formatGoogleDate = (date) => {
+                const pad = (n) => n.toString().padStart(2, '0');
+                return date.getFullYear() + 
+                       pad(date.getMonth() + 1) + 
+                       pad(date.getDate()) + 
+                       'T' + 
+                       pad(date.getHours()) + 
+                       pad(date.getMinutes()) + 
+                       pad(date.getSeconds());
+            };
+            
+            const params = new URLSearchParams({
+                action: 'TEMPLATE',
+                text: 'Move Car - Street Sweeping',
+                dates: `${formatGoogleDate(eventStart)}/${formatGoogleDate(eventEnd)}`,
+                details: `Street sweeping at ${address}${sideName}\nTime: ${timeRange}\n\n⚠️ Don't forget to set reminders! Suggested:\n• 6pm the night before\n• 30 minutes before\n\nRemember to move your car before sweeping starts!`,
+                location: address
+            });
+            
+            const googleCalendarUrl = `https://calendar.google.com/calendar/render?${params.toString()}`;
+            window.open(googleCalendarUrl, '_blank');
+            
+            showSuccessMessage('Opening Google Calendar...');
+        }
+
+        // Generate and download .ics calendar file
+        function generateCalendarEvent(schedule, address) {
+            if (!schedule.nextDate?.actualDate) {
+                alert('Cannot create calendar event - no valid date found.');
+                return;
+            }
+            
+            const eventDate = new Date(schedule.nextDate.actualDate);
+            const dayName = schedule.day || schedule.weekday || 'Street Sweeping';
+            const sideName = schedule.side !== 'Unknown Side' ? ` (${schedule.side} side)` : '';
+            const timeRange = schedule.timeDisplay || '';
+            
+            const startTimeStr = schedule.times?.[0]?.fromStr || '8';
+            const startHour = parseInt(startTimeStr);
+            
+            const eventStart = new Date(eventDate);
+            eventStart.setHours(startHour, 0, 0, 0);
+            
+            const eventEnd = new Date(eventStart);
+            eventEnd.setHours(startHour + 2, 0, 0, 0);
+            
+            // Reminder 1: 6pm the night before
+            const reminder1 = new Date(eventDate);
+            reminder1.setDate(reminder1.getDate() - 1);
+            reminder1.setHours(18, 0, 0, 0);
+            const reminder1Minutes = Math.floor((eventStart - reminder1) / 1000 / 60);
+            
+            // Reminder 2: 30 minutes before
+            const reminder2Minutes = 30;
+            
+            const formatICalDate = (date) => {
+                const pad = (n) => n.toString().padStart(2, '0');
+                return date.getUTCFullYear() + 
+                       pad(date.getUTCMonth() + 1) + 
+                       pad(date.getUTCDate()) + 
+                       'T' + 
+                       pad(date.getUTCHours()) + 
+                       pad(date.getUTCMinutes()) + 
+                       pad(date.getUTCSeconds()) + 'Z';
+            };
+            
+            const icsContent = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//SF Street Sweeping//EN',
+                'BEGIN:VEVENT',
+                `UID:${Date.now()}@streetsweeping.sf`,
+                `DTSTAMP:${formatICalDate(new Date())}`,
+                `DTSTART:${formatICalDate(eventStart)}`,
+                `DTEND:${formatICalDate(eventEnd)}`,
+                `SUMMARY:Move Car - Street Sweeping`,
+                `DESCRIPTION:Street sweeping at ${address}${sideName}\\nTime: ${timeRange}\\n\\nRemember to move your car before sweeping starts!`,
+                `LOCATION:${address}`,
+                `BEGIN:VALARM`,
+                `TRIGGER:-PT${reminder1Minutes}M`,
+                `ACTION:DISPLAY`,
+                `DESCRIPTION:Move car for street sweeping tomorrow`,
+                `END:VALARM`,
+                `BEGIN:VALARM`,
+                `TRIGGER:-PT${reminder2Minutes}M`,
+                `ACTION:DISPLAY`,
+                `DESCRIPTION:Street sweeping starts soon!`,
+                `END:VALARM`,
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\r\n');
+            
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `street-sweeping-${address.replace(/\s+/g, '-').toLowerCase()}.ics`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            showSuccessMessage();
+        }
+
+        // Show success message
+        function showSuccessMessage(text = '✅ Calendar event downloaded! Open it to add to your calendar.') {
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #48bb78;
+                color: white;
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                font-weight: 600;
+                z-index: 1000;
+                animation: slideDown 0.3s ease-out;
+            `;
+            message.textContent = text;
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.style.animation = 'slideUp 0.3s ease-out';
+                setTimeout(() => message.remove(), 300);
+            }, 3000);
+        }
+
+        // Show error message
+        function showError(message) {
+            const container = document.querySelector('.container');
+            const existing = container.querySelector('.error-message');
+            if (existing) existing.remove();
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `<strong>⚠️ Error</strong>${message}`;
+            container.insertBefore(errorDiv, container.firstChild);
+            
+            setTimeout(() => errorDiv.remove(), 8000);
+        }
+
+        // Screen navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function setLoadingText(text) {
+            document.getElementById('loadingText').textContent = text;
+        }
+
+        function backToSearch() {
+            showScreen('screen1');
+            const input = document.getElementById('addressInput');
+            input.value = '';
+            const errorMsg = document.querySelector('.error-message');
+            if (errorMsg) errorMsg.remove();
+        }
+    </script>
+</body>
+</html>
