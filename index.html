@@ -840,9 +840,23 @@
         }
 
         // Calculate next occurrence
-        function calculateNextOccurrence(schedule) {
-            const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const targetDay = daysOfWeek.indexOf(schedule.day);
+function calculateNextOccurrence(schedule) {
+    // Map abbreviated day names to full names
+    const dayMap = {
+        'Sun': 'Sunday',
+        'Mon': 'Monday',
+        'Tues': 'Tuesday',
+        'Wed': 'Wednesday',
+        'Thu': 'Thursday',
+        'Fri': 'Friday',
+        'Sat': 'Saturday'
+    };
+    
+    // Convert abbreviated day to full name if needed
+    const fullDay = dayMap[schedule.day] || schedule.day;
+    
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const targetDay = daysOfWeek.indexOf(fullDay);
             
             if (targetDay === -1) return null;
             
