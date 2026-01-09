@@ -1,0 +1,1255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;SF Street Sweeping - Find My Location&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>* {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #faf8f3;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>min-height: 100vh;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.header {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #4a7c59;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 24px 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.header h1 {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 28px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 0 0 8px 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.header .subtitle {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: rgba(255, 255, 255, 0.9);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.container {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>max-width: 500px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 0 auto;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 24px 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>#errorContainer {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>min-height: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>z-index: 1000;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.gps-button {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #5a8a5a;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 16px 24px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.2s;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 24px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gap: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.gps-button:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #6b9b6b;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-1px);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.gps-button:disabled {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #9a9a8a;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: not-allowed;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: none;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.divider {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #9a9a8a;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 24px 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.divider::before,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.divider::after {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>content: "";</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>top: 50%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 40%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: 1px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #d4d0c4;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.divider::before { left: 0; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.divider::after { right: 0; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.manual-toggle {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #6b7254;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: color 0.2s;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.manual-toggle:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #4a7c59;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.manual-section {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.manual-section.active {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-group {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-group label {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #3e4234;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-group input {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px 16px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #d4d0c4;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: border-color 0.2s;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: white;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #3e4234;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-group input:focus {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>outline: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-color: #5a8a5a;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-group input::placeholder {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #9a9a8a;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.search-btn {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #5a8a5a;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px 24px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.2s;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.search-btn:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #6b9b6b;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* Loading state */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.loading {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 40px 20px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.loading.active {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.spinner {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 40px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: 40px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 3px solid #d4d0c4;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-top-color: #5a8a5a;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>animation: spin 1s linear infinite;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 0 auto 16px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>@keyframes spin {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>to { transform: rotate(360deg); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.loading-text {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #6b7254;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* Results */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.results-section {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.results-section.active {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.detected-address {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: transparent;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 0 0 16px 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 24px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 2px solid #e8e6df;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.detected-address .label {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #6b7254;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 13px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 4px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.detected-address .address {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #3e4234;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 700;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.detected-address .edit-link {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #5a8a5a;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 13px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-decoration: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: color 0.2s;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.detected-address .edit-link:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #4a7c59;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-decoration: underline;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.result-card {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: white;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 24px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.schedule-day {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #3e4234;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 18px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 700;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.schedule-time {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #5a5742;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.schedule-detail {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #6b7254;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.calendar-actions {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gap: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.google-calendar-btn {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #5a8a5a;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.2s;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.google-calendar-btn:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #6b9b6b;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.ics-link {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #6b7254;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 13px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-decoration: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: color 0.2s;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.ics-link:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #5a8a5a;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-decoration: underline;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.new-search-btn {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: transparent;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #d4d0c4;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #5a8a5a;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px 24px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.2s;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 24px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.new-search-btn:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-color: #5a8a5a;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #f5f3ed;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.info-box {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #e8f5e9;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px 16px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 24px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 13px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #2e7d32;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>line-height: 1.5;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.screen {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.screen.active {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>@keyframes slideDown {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>from {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>opacity: 0;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>transform: translateX(-50%) translateY(-20px);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>to {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>opacity: 1;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>transform: translateX(-50%) translateY(0);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>@keyframes slideUp {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>from {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>opacity: 1;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>transform: translateX(-50%) translateY(0);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>to {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>opacity: 0;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>transform: translateX(-50%) translateY(-20px);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="header"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1&gt;🧹 SF Street Sweeping&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;p class="subtitle"&gt;Never forget to move your car&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Error messages appear here --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="errorContainer"&gt;&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- All screens wrapped --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="screens-wrapper"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Screen 1: Landing --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="screen1" class="screen active"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="gps-button" id="gpsButton" onclick="findMyLocation()"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>📍 Find My Location With GPS</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="divider"&gt;or&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="manual-toggle" onclick="toggleManual()"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>Enter address manually ▼</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="manualSection" class="manual-section"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="input-group"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label for="addressInput"&gt;Street Address&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>type="text"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>id="addressInput"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>placeholder="e.g., 191 Haight Street"</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>onkeypress="if(event.key === 'Enter') searchAddress()"</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="search-btn" onclick="searchAddress()"&gt;Search&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Screen 2: Loading --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="screen2" class="screen"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="loading active"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="spinner"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="loading-text" id="loadingText"&gt;Getting your location...&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Screen 3: Results --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="screen3" class="screen"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="detected-address"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="label" id="addressLabel"&gt;📍 Detected Location&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="address" id="detectedAddress"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;a class="edit-link" onclick="backToSearch()"&gt;Use different location&lt;/a&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="info-box"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;strong&gt;Add to Calendar:&lt;/strong&gt; Google Calendar opens instantly (remember to set reminders). .ics file includes automatic reminders at 6pm the night before + 30 min before.</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="scheduleList"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="new-search-btn" onclick="backToSearch()"&gt;Use Different Location&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt; &lt;!-- end screens-wrapper --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt; &lt;!-- end container --&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Global state</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let currentAddress = '';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.scheduleData = {};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Toggle manual entry section</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function toggleManual() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const section = document.getElementById('manualSection');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const btn = document.querySelector('.manual-toggle');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>section.classList.toggle('active');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>btn.textContent = section.classList.contains('active')<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>? 'Hide manual entry ▲'<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>: 'Enter address manually ▼';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Parse and normalize address</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function parseAddress(input) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const cleaned = input.trim().toUpperCase();</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Extract house number and street name</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const match = cleaned.match(/^(\d+)\s+(.+)$/);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!match) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>throw new Error('Please enter address as: NUMBER STREET (e.g., 191 Haight Street)');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const number = parseInt(match[1]);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let street = match[2];</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Normalize common street type abbreviations to match dataset format</p>
+<p class="p1"><span class="Apple-converted-space">            </span>street = street</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.replace(/\bSTREET\b/g, 'ST')</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.replace(/\bAVENUE\b/g, 'AVE')</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.replace(/\bBOULEVARD\b/g, 'BLVD')</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.replace(/\bDRIVE\b/g, 'DR')</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.replace(/\bROAD\b/g, 'RD')</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.replace(/\bLANE\b/g, 'LN')</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.replace(/\bCOURT\b/g, 'CT')</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.replace(/\bPLACE\b/g, 'PL')</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.replace(/\bTERRACE\b/g, 'TER')</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.replace(/\bWAY\b/g, 'WAY');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>return { number, street };</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Get current GPS location</p>
+<p class="p1"><span class="Apple-converted-space">        </span>async function findMyLocation() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.log('findMyLocation called');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const btn = document.getElementById('gpsButton');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>btn.disabled = true;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>btn.textContent = '📍 Getting location...';</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>showScreen('screen2');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>setLoadingText('Getting your location...');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Requesting GPS position...');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Get GPS coordinates</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const position = await getCurrentPosition();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('GPS position received:', position);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const lat = position.coords.latitude;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const lng = position.coords.longitude;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log(`Coordinates: ${lat}, ${lng}`);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>setLoadingText('Finding your address...');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Reverse geocode to get address</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Starting reverse geocode...');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const address = await reverseGeocode(lat, lng);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Address found:', address);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!address) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw new Error('Could not determine address from GPS location');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Search for street sweeping at this address</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Searching for schedules...');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>await performSearch(address, true);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.error('GPS Error:', error);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Determine error type</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (error.message.startsWith('API_BLOCKED:')) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const cleanMessage = error.message.replace('API_BLOCKED: ', '');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showError(cleanMessage, 'api');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else if (error.message.includes('denied') || error.message.includes('enable location')) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showError(error.message, 'user');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else if (error.message.includes('outside San Francisco')) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showError(error.message, 'user');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showError(error.message || 'Could not get your location', 'user');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>backToSearch();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} finally {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>btn.disabled = false;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>btn.textContent = '📍 Find My Location With GPS';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Get GPS position (promisified)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function getCurrentPosition() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.log('getCurrentPosition called');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return new Promise((resolve, reject) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!navigator.geolocation) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.error('Geolocation not supported');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>reject(new Error('GPS not supported by your browser'));</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Calling navigator.geolocation.getCurrentPosition...');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>navigator.geolocation.getCurrentPosition(</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>position =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>console.log('Position success callback:', position);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>resolve(position);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>error =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>console.error('Position error callback:', error);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>let message = 'Could not get your location';</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (error.code === 1) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>message = 'Location access denied. Please enable location in your browser settings.';</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>} else if (error.code === 2) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>message = 'Location unavailable. Please check your GPS settings.';</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>} else if (error.code === 3) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>message = 'Location request timed out. Please try again.';</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>reject(new Error(message));</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>enableHighAccuracy: true,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>timeout: 10000,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>maximumAge: 0</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Reverse geocode using Nominatim (OpenStreetMap)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>async function reverseGeocode(lat, lng) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log(`Reverse geocoding: ${lat}, ${lng}`);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&amp;lon=${lng}&amp;format=json`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Fetching from:', url);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(url, {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>headers: {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>'User-Agent': 'SF Street Sweeping App'</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Fetch response status:', response.status);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!response.ok) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw new Error('Geocoding service unavailable');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const data = await response.json();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Geocode data:', data);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Check if we're in San Francisco</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const city = data.address?.city || data.address?.town || data.address?.village || '';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('City detected:', city);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!city.toLowerCase().includes('san francisco')) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw new Error('You appear to be outside San Francisco. This app only works for SF addresses.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Extract street address</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const houseNumber = data.address?.house_number || '';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const road = data.address?.road || '';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('House number:', houseNumber, 'Road:', road);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!road) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw new Error('Could not determine street address from your location');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const address = houseNumber ? `${houseNumber} ${road}` : road;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Final address:', address);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return address;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.error('Reverse geocoding error:', error);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>throw error;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Manual address search</p>
+<p class="p1"><span class="Apple-converted-space">        </span>async function searchAddress() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const input = document.getElementById('addressInput');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const address = input.value.trim();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!address) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showError('Please enter an address', 'user');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>showScreen('screen2');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>setLoadingText('Searching for address...');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>await performSearch(address, false);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Perform street sweeping search</p>
+<p class="p1"><span class="Apple-converted-space">        </span>async function performSearch(address, isGPS) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>currentAddress = address;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Get CNN and side from address using new dataset</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Getting CNN for address:', address);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const result = await getCNN(address);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!result || !result.cnn) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw new Error('USER_ERROR: Address not found in San Francisco database. Please check the spelling and try again.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Got CNN:', result.cnn, 'Side:', result.side);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Get street sweeping data for this CNN and side</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const schedules = await getStreetSweeping(result.cnn, result.side);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!schedules || schedules.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw new Error('USER_ERROR: No street sweeping schedules found for this address.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Show results</p>
+<p class="p1"><span class="Apple-converted-space">                </span>displayResults(address, schedules, isGPS);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.error('Search error:', error);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Determine if it's an API issue or user issue</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (error.message.startsWith('API_BLOCKED:')) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const cleanMessage = error.message.replace('API_BLOCKED: ', '');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showError(cleanMessage, 'api');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else if (error.message.startsWith('USER_ERROR:')) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const cleanMessage = error.message.replace('USER_ERROR: ', '');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showError(cleanMessage, 'user');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showError(error.message || 'An error occurred while searching', 'unknown');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>backToSearch();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Get CNN from address using List of Streets and Intersections dataset</p>
+<p class="p1"><span class="Apple-converted-space">        </span>async function getCNN(searchAddress) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Parsing address:', searchAddress);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Parse address into number and street name</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const { number: houseNumber, street: streetName } = parseAddress(searchAddress);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Parsed:', { houseNumber, streetName });</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Search for street name in Streets and Intersections dataset</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const url = `https://data.sfgov.org/resource/pu5n-qu5c.json?streetname=${encodeURIComponent(streetName)}`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Searching:', url);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(url);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (response.status === 403 || response.status === 404) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw new Error('API_BLOCKED: The San Francisco data service cannot be reached. This is a temporary issue with the city\'s servers. Please try again later.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!response.ok) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw new Error('API_BLOCKED: The San Francisco data service is experiencing issues. Please try again in a few hours.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const segments = await response.json();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Found segments:', segments.length);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!segments || segments.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw new Error(`USER_ERROR: Street "${streetName}" not found. Please check the spelling and make sure to include the street type (St, Ave, Blvd, etc.).`);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Determine if address is odd (left side) or even (right side)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const isOdd = houseNumber % 2 === 1;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const sideCode = isOdd ? 'L' : 'R';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Address is', isOdd ? 'odd (left side)' : 'even (right side)');</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Find segment where house number falls in range</p>
+<p class="p1"><span class="Apple-converted-space">                </span>for (const segment of segments) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Skip intersection records (no address ranges)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (!segment.lf_fadd || !segment.rt_fadd) continue;</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (isOdd) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Check left side (odd addresses)</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const leftMin = parseInt(segment.lf_fadd);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const leftMax = parseInt(segment.lf_tadd);</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (houseNumber &gt;= leftMin &amp;&amp; houseNumber &lt;= leftMax) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>console.log('Match found! CNN:', segment.cnn, 'Side:', sideCode);</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>return { cnn: segment.cnn, side: sideCode };</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Check right side (even addresses)</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const rightMin = parseInt(segment.rt_fadd);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const rightMax = parseInt(segment.rt_tadd);</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (houseNumber &gt;= rightMin &amp;&amp; houseNumber &lt;= rightMax) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>console.log('Match found! CNN:', segment.cnn, 'Side:', sideCode);</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>return { cnn: segment.cnn, side: sideCode };</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// No matching range found</p>
+<p class="p1"><span class="Apple-converted-space">                </span>throw new Error(`USER_ERROR: Address ${houseNumber} ${streetName} not found. Please check the house number is correct.`);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Re-throw API_BLOCKED and USER_ERROR as-is</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (error.message.startsWith('API_BLOCKED:') || error.message.startsWith('USER_ERROR:')) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw error;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Wrap other errors</p>
+<p class="p1"><span class="Apple-converted-space">                </span>throw new Error('API_BLOCKED: Cannot connect to San Francisco data service. Please check your internet connection and try again.');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Get street sweeping schedules (now with side filter)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>async function getStreetSweeping(cnn, side) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Query with CNN and side filter (L for left/odd, R for right/even)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const url = `https://data.sfgov.org/resource/yhqp-riqs.json?cnn=${cnn}&amp;cnnrightleft=${side}`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Fetching street sweeping:', url);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(url);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (response.status === 403 || response.status === 404) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw new Error('API_BLOCKED: The San Francisco data service cannot be reached. This is a temporary issue with the city\'s servers. Please try again later.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!response.ok) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw new Error('API_BLOCKED: The San Francisco data service is experiencing issues. Please try again in a few hours.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const data = await response.json();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Street sweeping records:', data.length);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!data || data.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw new Error('USER_ERROR: No street sweeping schedule found for this side of the street. This may be a private street or not subject to street sweeping.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>return processSchedules(data);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (error.message.startsWith('API_BLOCKED:') || error.message.startsWith('USER_ERROR:')) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>throw error;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>throw new Error('API_BLOCKED: Cannot connect to San Francisco data service. Please check your internet connection and try again.');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Process and group schedules</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function processSchedules(data) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const grouped = {};</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>data.forEach(item =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const weekday = item.weekday || 'Unknown';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const blockside = item.blockside || 'Unknown';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const key = `${weekday}-${blockside}`;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!grouped[key]) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>grouped[key] = {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>day: weekday,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>side: blockside,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>times: [],</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>weeks: {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>week1: item.week1,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>week2: item.week2,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>week3: item.week3,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>week4: item.week4,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>week5: item.week5</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (item.fromhour &amp;&amp; item.tohour) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>grouped[key].times.push({</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>fromStr: item.fromhour,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>toStr: item.tohour,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>from: parseInt(item.fromhour),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>to: parseInt(item.tohour)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Calculate next occurrence for each schedule</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Object.values(grouped).forEach(schedule =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>schedule.nextDate = calculateNextOccurrence(schedule);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>schedule.timeDisplay = formatTimeRange(schedule.times);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>schedule.pattern = getWeekPattern(schedule.weeks);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Sort by next occurrence</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return Object.values(grouped).sort((a, b) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!a.nextDate?.actualDate) return 1;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!b.nextDate?.actualDate) return -1;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return new Date(a.nextDate.actualDate) - new Date(b.nextDate.actualDate);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Calculate next occurrence</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function calculateNextOccurrence(schedule) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const targetDay = daysOfWeek.indexOf(schedule.day);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (targetDay === -1) return null;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const activeWeeks = [];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 1; i &lt;= 5; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (schedule.weeks[`week${i}`] === "1") {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>activeWeeks.push(i);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (activeWeeks.length === 0) return null;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const today = new Date();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let checkDate = new Date(today);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; 60; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (checkDate.getDay() === targetDay) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const weekOfMonth = Math.ceil(checkDate.getDate() / 7);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (activeWeeks.includes(weekOfMonth)) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>return {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>date: checkDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>actualDate: new Date(checkDate)</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>checkDate.setDate(checkDate.getDate() + 1);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>return null;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Format time range</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function formatTimeRange(times) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!times || times.length === 0) return 'Time not specified';</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>times.sort((a, b) =&gt; a.from - b.from);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const first = times[0];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const last = times[times.length - 1];</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const formatHour = (hour) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const h = parseInt(hour);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (h === 0) return '12am';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (h &lt; 12) return h + 'am';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (h === 12) return '12pm';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return (h - 12) + 'pm';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>return `${formatHour(first.fromStr)}-${formatHour(last.toStr)}`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Get week pattern</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function getWeekPattern(weeks) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const activeWeeks = [];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const weekNames = ['', '1st', '2nd', '3rd', '4th', '5th'];</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 1; i &lt;= 5; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (weeks[`week${i}`] === "1") {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>activeWeeks.push(i);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (activeWeeks.length === 5) return '';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (activeWeeks.length === 0) return '';</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>return ' (' + activeWeeks.map(w =&gt; weekNames[w]).join(' &amp; ') + ')';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Display results</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function displayResults(address, schedules, isGPS) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('detectedAddress').textContent = address.toUpperCase();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('addressLabel').textContent = isGPS ? '📍 Detected Location' : '📍 Your Address';</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const scheduleList = document.getElementById('scheduleList');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>scheduleList.innerHTML = '';</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>schedules.forEach((schedule, index) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const scheduleId = `schedule_${Date.now()}_${index}`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>window.scheduleData[scheduleId] = { schedule, address };</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const card = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>card.className = 'result-card';</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const dayDisplay = schedule.day || 'Unknown day';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const sideDisplay = schedule.side ? ` - ${schedule.side} side` : '';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const nextText = schedule.nextDate?.date ? `Next: ${schedule.nextDate.date}` : 'Next occurrence not found';</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>card.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="schedule-day"&gt;${dayDisplay}${sideDisplay}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="schedule-time"&gt;${schedule.timeDisplay}${schedule.pattern}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="schedule-detail"&gt;${nextText}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="calendar-actions"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button class="google-calendar-btn" data-schedule-id="${scheduleId}"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>📅 Add to Google Calendar</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;a href="#" class="ics-link" data-schedule-id="${scheduleId}"&gt;Download .ics file&lt;/a&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>scheduleList.appendChild(card);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Add event listeners</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.querySelectorAll('.google-calendar-btn').forEach(btn =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>btn.addEventListener('click', function() {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const scheduleId = this.getAttribute('data-schedule-id');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const data = window.scheduleData[scheduleId];</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (data) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>openGoogleCalendar(data.schedule, data.address);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.querySelectorAll('.ics-link').forEach(link =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>link.addEventListener('click', function(e) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const scheduleId = this.getAttribute('data-schedule-id');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const data = window.scheduleData[scheduleId];</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (data) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>generateCalendarEvent(data.schedule, data.address);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>showScreen('screen3');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Open Google Calendar with pre-filled event</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function openGoogleCalendar(schedule, address) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!schedule.nextDate?.actualDate) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>alert('Cannot create calendar event - no valid date found.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const eventDate = new Date(schedule.nextDate.actualDate);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const dayName = schedule.day || schedule.weekday || 'Street Sweeping';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const sideName = schedule.side ? ` (${schedule.side} side)` : '';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const timeRange = schedule.timeDisplay || '';</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const startTimeStr = schedule.times?.[0]?.fromStr || '8';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const endTimeStr = schedule.times?.[0]?.toStr || '10';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const startHour = parseInt(startTimeStr);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const endHour = parseInt(endTimeStr);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const eventStart = new Date(eventDate);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>eventStart.setHours(startHour, 0, 0, 0);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const eventEnd = new Date(eventDate);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>eventEnd.setHours(endHour, 0, 0, 0);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const formatGoogleDate = (date) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const pad = (n) =&gt; n.toString().padStart(2, '0');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return date.getFullYear() +<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>pad(date.getMonth() + 1) +<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>pad(date.getDate()) +<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>'T' +<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>pad(date.getHours()) +<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>pad(date.getMinutes()) +<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>pad(date.getSeconds());</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const params = new URLSearchParams({</p>
+<p class="p1"><span class="Apple-converted-space">                </span>action: 'TEMPLATE',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>text: 'Move Car - Street Sweeping',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>dates: `${formatGoogleDate(eventStart)}/${formatGoogleDate(eventEnd)}`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>details: `Street sweeping at ${address}${sideName}\nTime: ${timeRange}\n\n⚠️ Don't forget to set reminders! Suggested:\n• 6pm the night before\n• 30 minutes before\n\nRemember to move your car before sweeping starts!`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>location: address</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const googleCalendarUrl = `https://calendar.google.com/calendar/render?${params.toString()}`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.open(googleCalendarUrl, '_blank');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>showSuccessMessage('Opening Google Calendar...');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Generate and download .ics calendar file</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function generateCalendarEvent(schedule, address) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!schedule.nextDate?.actualDate) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>alert('Cannot create calendar event - no valid date found.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const eventDate = new Date(schedule.nextDate.actualDate);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const dayName = schedule.day || schedule.weekday || 'Street Sweeping';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const sideName = schedule.side ? ` (${schedule.side} side)` : '';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const timeRange = schedule.timeDisplay || '';</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const startTimeStr = schedule.times?.[0]?.fromStr || '8';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const startHour = parseInt(startTimeStr);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const eventStart = new Date(eventDate);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>eventStart.setHours(startHour, 0, 0, 0);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const eventEnd = new Date(eventStart);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>eventEnd.setHours(startHour + 2, 0, 0, 0);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Reminder 1: 6pm the night before</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const reminder1 = new Date(eventDate);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>reminder1.setDate(reminder1.getDate() - 1);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>reminder1.setHours(18, 0, 0, 0);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const reminder1Minutes = Math.floor((eventStart - reminder1) / 1000 / 60);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Reminder 2: 30 minutes before</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const reminder2Minutes = 30;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const formatICalDate = (date) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const pad = (n) =&gt; n.toString().padStart(2, '0');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return date.getUTCFullYear() +<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>pad(date.getUTCMonth() + 1) +<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>pad(date.getUTCDate()) +<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>'T' +<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>pad(date.getUTCHours()) +<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>pad(date.getUTCMinutes()) +<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>pad(date.getUTCSeconds()) + 'Z';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const icsContent = [</p>
+<p class="p1"><span class="Apple-converted-space">                </span>'BEGIN:VCALENDAR',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>'VERSION:2.0',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>'PRODID:-//SF Street Sweeping//EN',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>'BEGIN:VEVENT',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`UID:${Date.now()}@streetsweeping.sf`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`DTSTAMP:${formatICalDate(new Date())}`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`DTSTART:${formatICalDate(eventStart)}`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`DTEND:${formatICalDate(eventEnd)}`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`SUMMARY:Move Car - Street Sweeping`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`DESCRIPTION:Street sweeping at ${address}${sideName}\\nTime: ${timeRange}\\n\\nRemember to move your car before sweeping starts!`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`LOCATION:${address}`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`BEGIN:VALARM`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`TRIGGER:-PT${reminder1Minutes}M`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`ACTION:DISPLAY`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`DESCRIPTION:Move car for street sweeping tomorrow`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`END:VALARM`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`BEGIN:VALARM`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`TRIGGER:-PT${reminder2Minutes}M`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`ACTION:DISPLAY`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`DESCRIPTION:Street sweeping starts soon!`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`END:VALARM`,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>'END:VEVENT',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>'END:VCALENDAR'</p>
+<p class="p1"><span class="Apple-converted-space">            </span>].join('\r\n');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const url = window.URL.createObjectURL(blob);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const link = document.createElement('a');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>link.href = url;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>link.download = `street-sweeping-${address.replace(/\s+/g, '-').toLowerCase()}.ics`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.body.appendChild(link);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>link.click();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.body.removeChild(link);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.URL.revokeObjectURL(url);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>showSuccessMessage();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Show success message</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function showSuccessMessage(text = '✅ Calendar event downloaded! Open it to add to your calendar.') {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const message = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>message.style.cssText = `</p>
+<p class="p1"><span class="Apple-converted-space">                </span>position: fixed;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>top: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>left: 50%;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>transform: translateX(-50%);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>background: #48bb78;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>padding: 16px 24px;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>border-radius: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>box-shadow: 0 4px 12px rgba(0,0,0,0.15);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>font-weight: 600;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>z-index: 1000;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>animation: slideDown 0.3s ease-out;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>message.textContent = text;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.body.appendChild(message);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>message.style.animation = 'slideUp 0.3s ease-out';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; message.remove(), 300);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, 3000);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Show error message</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function showError(message, type = 'user') {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.log('showError called:', { message, type });</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Insert into the dedicated error container</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const container = document.getElementById('errorContainer');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.log('Error container:', container);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!container) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.error('Could not find errorContainer!');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const existing = document.querySelector('.error-message');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (existing) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Removing existing error');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>existing.remove();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const errorDiv = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>errorDiv.className = 'error-message';</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Different styling based on error type</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (type === 'api') {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// API issues - orange/warning color</p>
+<p class="p1"><span class="Apple-converted-space">                </span>errorDiv.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;strong&gt;⚠️ Service Temporarily Unavailable&lt;/strong&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p style="margin: 8px 0 0 0; line-height: 1.5;"&gt;${message}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p style="margin: 8px 0 0 0; font-size: 13px; opacity: 0.8;"&gt;This is not an issue with your location or address. The city's data service will be back soon.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>errorDiv.style.cssText = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>background: #fff3cd !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: 2px solid #ffc107 !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border-radius: 10px !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: 16px !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>margin-bottom: 24px !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>color: #856404 !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: 100% !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>box-sizing: border-box !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>display: block !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>visibility: visible !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>opacity: 1 !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>position: relative !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>z-index: 10000 !important;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else if (type === 'user') {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// User issues - red color</p>
+<p class="p1"><span class="Apple-converted-space">                </span>errorDiv.innerHTML = `&lt;strong&gt;⚠️ Error&lt;/strong&gt;&lt;p style="margin: 8px 0 0 0; line-height: 1.5;"&gt;${message}&lt;/p&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>errorDiv.style.cssText = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>background: #fee !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: 2px solid #f44336 !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border-radius: 10px !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: 16px !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>margin-bottom: 24px !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>color: #c62828 !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: 100% !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>box-sizing: border-box !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>display: block !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>visibility: visible !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>opacity: 1 !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>position: relative !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>z-index: 10000 !important;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Unknown - neutral yellow</p>
+<p class="p1"><span class="Apple-converted-space">                </span>errorDiv.innerHTML = `&lt;strong&gt;⚠️ Error&lt;/strong&gt;&lt;p style="margin: 8px 0 0 0; line-height: 1.5;"&gt;${message}&lt;/p&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>errorDiv.style.cssText = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>background: #fff3cd !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: 2px solid #ffc107 !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border-radius: 10px !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: 16px !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>margin-bottom: 24px !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>color: #856404 !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: 100% !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>box-sizing: border-box !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>display: block !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>visibility: visible !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>opacity: 1 !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>position: relative !important;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>z-index: 10000 !important;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.log('Created error div:', errorDiv);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Append to dedicated error container</p>
+<p class="p1"><span class="Apple-converted-space">            </span>container.appendChild(errorDiv);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.log('Error appended to errorContainer');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Error will stay visible until user tries again (no auto-remove)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Screen navigation</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function showScreen(screenId) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.querySelectorAll('.screen').forEach(screen =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>screen.classList.remove('active');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById(screenId).classList.add('active');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function setLoadingText(text) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('loadingText').textContent = text;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function backToSearch() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.log('backToSearch called - switching to screen1');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>showScreen('screen1');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const input = document.getElementById('addressInput');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>input.value = '';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Don't remove errors here - let user dismiss or try again</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
