@@ -683,79 +683,82 @@
             }
         }
 
-        // Get CNN from address using List of Streets and Intersections dataset
-        async function getCNN(searchAddress) {
-            try {
-                console.log('Parsing address:', searchAddress);
-                
-                // Parse address into number and street name
-                const { number: houseNumber, street: streetName } = parseAddress(searchAddress);
-                console.log('Parsed:', { houseNumber, streetName });
-                
-                // Search for street name in Streets and Intersections dataset
-                const url = `https://data.sfgov.org/resource/pu5n-qu5c.json?streetname=${encodeURIComponent(streetName)}`;
-                console.log('Searching:', url);
-                
-                const response = await fetch(url);
-                
-                if (response.status === 403 || response.status === 404) {
-                    throw new Error('API_BLOCKED: The San Francisco data service cannot be reached. This is a temporary issue with the city\'s servers. Please try again later.');
-                }
-                
-                if (!response.ok) {
-                    throw new Error('API_BLOCKED: The San Francisco data service is experiencing issues. Please try again in a few hours.');
-                }
-                
-                const segments = await response.json();
-                console.log('Found segments:', segments.length);
-                
-                if (!segments || segments.length === 0) {
-                    throw new Error(`USER_ERROR: Street "${streetName}" not found. Please check the spelling and make sure to include the street type (St, Ave, Blvd, etc.).`);
-                }
-                
-                // Determine if address is odd (left side) or even (right side)
-                const isOdd = houseNumber % 2 === 1;
-                const sideCode = isOdd ? 'L' : 'R';
-                console.log('Address is', isOdd ? 'odd (left side)' : 'even (right side)');
-                
-                // Find segment where house number falls in range
-                for (const segment of segments) {
-                    // Skip intersection records (no address ranges)
-                    if (!segment.lf_fadd || !segment.rt_fadd) continue;
-                    
-                    if (isOdd) {
-                        // Check left side (odd addresses)
-                        const leftMin = parseInt(segment.lf_fadd);
-                        const leftMax = parseInt(segment.lf_tadd);
-                        
-                        if (houseNumber >= leftMin && houseNumber <= leftMax) {
-                            console.log('Match found! CNN:', segment.cnn, 'Side:', sideCode);
-                            return { cnn: segment.cnn, side: sideCode };
-                        }
-                    } else {
-                        // Check right side (even addresses)
-                        const rightMin = parseInt(segment.rt_fadd);
-                        const rightMax = parseInt(segment.rt_tadd);
-                        
-                        if (houseNumber >= rightMin && houseNumber <= rightMax) {
-                            console.log('Match found! CNN:', segment.cnn, 'Side:', sideCode);
-                            return { cnn: segment.cnn, side: sideCode };
-                        }
-                    }
-                }
-                
-                // No matching range found
-                throw new Error(`USER_ERROR: Address ${houseNumber} ${streetName} not found. Please check the house number is correct.`);
-                
-            } catch (error) {
-                // Re-throw API_BLOCKED and USER_ERROR as-is
-                if (error.message.startsWith('API_BLOCKED:') || error.message.startsWith('USER_ERROR:')) {
-                    throw error;
-                }
-                // Wrap other errors
-                throw new Error('API_BLOCKED: Cannot connect to San Francisco data service. Please check your internet connection and try again.');
+       // Get CNN from address using List of Streets and Intersections dataset
+async function getCNN(searchAddress) {
+    try {
+        console.log('Parsing address:', searchAddress);
+        
+        // Parse address into number and street name
+        const { number: houseNumber, street: streetName } = parseAddress(searchAddress);
+        console.log('Parsed:', { houseNumber, streetName });
+        
+        // Search for street name in Streets and Intersections dataset
+        const url = `https://data.sfgov.org/resource/pu5n-qu5c.json?streetname=${encodeURIComponent(streetName)}`;
+        console.log('Searching:', url);
+        
+        const response = await fetch(url);
+        
+        if (response.status === 403 || response.status === 404) {
+            throw new Error('API_BLOCKED: The San Francisco data service cannot be reached. This is a temporary issue with the city\'s servers. Please try again later.');
+        }
+        
+        if (!response.ok) {
+            throw new Error('API_BLOCKED: The San Francisco data service is experiencing issues. Please try again in a few hours.');
+        }
+        
+        const segments = await response.json();
+        console.log('Found segments:', segments.length);
+        
+        if (!segments || segments.length === 0) {
+            throw new Error(`USER_ERROR: Street "${streetName}" not found. Please check the spelling and make sure to include the street type (St, Ave, Blvd, etc.).`);
+        }
+        
+        // Determine if address is odd or even
+        const isAddressOdd = houseNumber % 2 === 1;
+        console.log('Address', houseNumber, 'is', isAddressOdd ? 'odd' : 'even');
+        
+        // Find segment where house number falls in range
+        for (const segment of segments) {
+            // Skip intersection records (no address ranges)
+            if (!segment.lf_fadd || !segment.rt_fadd) continue;
+            
+            const leftMin = parseInt(segment.lf_fadd);
+            const leftMax = parseInt(segment.lf_tadd);
+            const rightMin = parseInt(segment.rt_fadd);
+            const rightMax = parseInt(segment.rt_tadd);
+            
+            // Determine which side has odd numbers
+            const isLeftSideOdd = leftMin % 2 === 1;
+            const isRightSideOdd = rightMin % 2 === 1;
+            
+            console.log('Segment:', leftMin, '-', leftMax, '(left)', rightMin, '-', rightMax, '(right)');
+            console.log('Left side is', isLeftSideOdd ? 'odd' : 'even', ', Right side is', isRightSideOdd ? 'odd' : 'even');
+            
+            // Check if address falls in left side range AND has matching parity
+            if (houseNumber >= leftMin && houseNumber <= leftMax && isAddressOdd === isLeftSideOdd) {
+                console.log('Match found! Address is on LEFT side (L)');
+                return { cnn: segment.cnn, side: 'L' };
+            }
+            
+            // Check if address falls in right side range AND has matching parity
+            if (houseNumber >= rightMin && houseNumber <= rightMax && isAddressOdd === isRightSideOdd) {
+                console.log('Match found! Address is on RIGHT side (R)');
+                return { cnn: segment.cnn, side: 'R' };
             }
         }
+        
+        // No matching range found
+        throw new Error(`USER_ERROR: Address ${houseNumber} ${streetName} not found. Please check the house number is correct.`);
+        
+    } catch (error) {
+        // Re-throw API_BLOCKED and USER_ERROR as-is
+        if (error.message.startsWith('API_BLOCKED:') || error.message.startsWith('USER_ERROR:')) {
+            throw error;
+        }
+        // Wrap other errors
+        throw new Error('API_BLOCKED: Cannot connect to San Francisco data service. Please check your internet connection and try again.');
+    }
+}
 
         // Get street sweeping schedules (now with side filter)
         async function getStreetSweeping(cnn, side) {
