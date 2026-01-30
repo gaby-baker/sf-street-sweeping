@@ -616,6 +616,7 @@
 
                 const address = houseNumber ? `${houseNumber} ${road}` : road;
                 console.log('Final address:', address);
+                alert('GPS detected: ' + address); // TEMPORARY - shows what GPS found
                 return address;
 
             } catch (error) {
