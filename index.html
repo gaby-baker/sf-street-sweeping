@@ -430,10 +430,6 @@
                 <a class="edit-link" onclick="backToSearch()">Use different location</a>
             </div>
 
-            <div class="info-box">
-                <strong>Add to Calendar:</strong> Google Calendar opens instantly (remember to set reminders). .ics file includes automatic reminders at 6pm the night before + 30 min before.
-            </div>
-
             <div id="scheduleList"></div>
 
             <button class="new-search-btn" onclick="backToSearch()">Use Different Location</button>
@@ -643,46 +639,80 @@
 
         // Perform street sweeping search
         async function performSearch(address, isGPS) {
-            try {
-                currentAddress = address;
+    try {
+        currentAddress = address;
 
-                // Get CNN and side from address using new dataset
-                console.log('Getting CNN for address:', address);
-                const result = await getCNN(address);
-                
-                if (!result || !result.cnn) {
-                    throw new Error('USER_ERROR: Address not found in San Francisco database. Please check the spelling and try again.');
-                }
-
-                console.log('Got CNN:', result.cnn, 'Side:', result.side);
-
-                // Get street sweeping data for this CNN and side
-                const schedules = await getStreetSweeping(result.cnn, result.side);
-
-                if (!schedules || schedules.length === 0) {
-                    throw new Error('USER_ERROR: No street sweeping schedules found for this address.');
-                }
-
-                // Show results
-                displayResults(address, schedules, isGPS);
-
-            } catch (error) {
-                console.error('Search error:', error);
-                
-                // Determine if it's an API issue or user issue
-                if (error.message.startsWith('API_BLOCKED:')) {
-                    const cleanMessage = error.message.replace('API_BLOCKED: ', '');
-                    showError(cleanMessage, 'api');
-                } else if (error.message.startsWith('USER_ERROR:')) {
-                    const cleanMessage = error.message.replace('USER_ERROR: ', '');
-                    showError(cleanMessage, 'user');
-                } else {
-                    showError(error.message || 'An error occurred while searching', 'unknown');
-                }
-                
-                backToSearch();
-            }
+        // Get CNN and side from address using new dataset
+        console.log('Getting CNN for address:', address);
+        const result = await getCNN(address);
+        
+        if (!result || !result.cnn) {
+            throw new Error('USER_ERROR: Address not found in San Francisco database. Please check the spelling and try again.');
         }
+
+        console.log('Got CNN:', result.cnn, 'Side:', result.side);
+
+        // For GPS: get schedules for BOTH sides
+        if (isGPS) {
+            const allSchedules = [];
+            
+            // Get schedule for detected side
+            try {
+                const schedulesDetected = await getStreetSweeping(result.cnn, result.side);
+                if (schedulesDetected && schedulesDetected.length > 0) {
+                    allSchedules.push(...schedulesDetected);
+                }
+            } catch (error) {
+                console.log('Could not load schedule for detected side:', error);
+            }
+            
+            // Get schedule for opposite side
+            const oppositeSide = result.side === 'L' ? 'R' : 'L';
+            try {
+                const schedulesOpposite = await getStreetSweeping(result.cnn, oppositeSide);
+                if (schedulesOpposite && schedulesOpposite.length > 0) {
+                    allSchedules.push(...schedulesOpposite);
+                }
+            } catch (error) {
+                console.log('Could not load schedule for opposite side:', error);
+            }
+            
+            if (allSchedules.length === 0) {
+                throw new Error('USER_ERROR: No street sweeping schedules found for this address.');
+            }
+            
+            // Show results with both sides
+            displayResults(address, allSchedules, isGPS);
+            
+        } else {
+            // For manual entry: get schedule for only the entered side
+            const schedules = await getStreetSweeping(result.cnn, result.side);
+
+            if (!schedules || schedules.length === 0) {
+                throw new Error('USER_ERROR: No street sweeping schedules found for this address.');
+            }
+
+            // Show results
+            displayResults(address, schedules, isGPS);
+        }
+
+    } catch (error) {
+        console.error('Search error:', error);
+        
+        // Determine if it's an API issue or user issue
+        if (error.message.startsWith('API_BLOCKED:')) {
+            const cleanMessage = error.message.replace('API_BLOCKED: ', '');
+            showError(cleanMessage, 'api');
+        } else if (error.message.startsWith('USER_ERROR:')) {
+            const cleanMessage = error.message.replace('USER_ERROR: ', '');
+            showError(cleanMessage, 'user');
+        } else {
+            showError(error.message || 'An error occurred while searching', 'unknown');
+        }
+        
+        backToSearch();
+    }
+}
 
        // Get CNN from address using List of Streets and Intersections dataset
 async function getCNN(searchAddress) {
@@ -929,63 +959,75 @@ function calculateNextOccurrence(schedule) {
         }
 
         // Display results
-        function displayResults(address, schedules, isGPS) {
-            document.getElementById('detectedAddress').textContent = address.toUpperCase();
-            document.getElementById('addressLabel').textContent = isGPS ? '📍 Detected Location' : '📍 Your Address';
-            
-            const scheduleList = document.getElementById('scheduleList');
-            scheduleList.innerHTML = '';
-            
-            schedules.forEach((schedule, index) => {
-                const scheduleId = `schedule_${Date.now()}_${index}`;
-                window.scheduleData[scheduleId] = { schedule, address };
-                
-                const card = document.createElement('div');
-                card.className = 'result-card';
-                
-                const dayDisplay = schedule.day || 'Unknown day';
-                const sideDisplay = schedule.side ? ` - ${schedule.side} side` : '';
-                const nextText = schedule.nextDate?.date ? `Next: ${schedule.nextDate.date}` : 'Next occurrence not found';
-                
-                card.innerHTML = `
-                    <div class="schedule-day">${dayDisplay}${sideDisplay}</div>
-                    <div class="schedule-time">${schedule.timeDisplay}${schedule.pattern}</div>
-                    <div class="schedule-detail">${nextText}</div>
-                    <div class="calendar-actions">
-                        <button class="google-calendar-btn" data-schedule-id="${scheduleId}">
-                            📅 Add to Google Calendar
-                        </button>
-                        <a href="#" class="ics-link" data-schedule-id="${scheduleId}">Download .ics file</a>
-                    </div>
-                `;
-                
-                scheduleList.appendChild(card);
-            });
-            
-            // Add event listeners
-            document.querySelectorAll('.google-calendar-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const scheduleId = this.getAttribute('data-schedule-id');
-                    const data = window.scheduleData[scheduleId];
-                    if (data) {
-                        openGoogleCalendar(data.schedule, data.address);
-                    }
-                });
-            });
-            
-            document.querySelectorAll('.ics-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const scheduleId = this.getAttribute('data-schedule-id');
-                    const data = window.scheduleData[scheduleId];
-                    if (data) {
-                        generateCalendarEvent(data.schedule, data.address);
-                    }
-                });
-            });
-            
-            showScreen('screen3');
-        }
+function displayResults(address, schedules, isGPS) {
+    document.getElementById('detectedAddress').textContent = address.toUpperCase();
+    document.getElementById('addressLabel').textContent = isGPS ? '📍 Detected Location' : '📍 Your Address';
+    
+    const scheduleList = document.getElementById('scheduleList');
+    scheduleList.innerHTML = '';
+    
+    // Add GPS warning message if using GPS
+    if (isGPS) {
+        const warning = document.createElement('div');
+        warning.className = 'gps-warning';
+        warning.innerHTML = `
+            <div style="background: #e3f2fd; border: 2px solid #90caf9; border-radius: 10px; padding: 16px; margin-bottom: 24px; color: #1565c0; font-size: 14px; line-height: 1.5;">
+                🗺️ GPS may not be precise. Both sides of the street shown below:
+            </div>
+        `;
+        scheduleList.appendChild(warning);
+    }
+    
+    schedules.forEach((schedule, index) => {
+        const scheduleId = `schedule_${Date.now()}_${index}`;
+        window.scheduleData[scheduleId] = { schedule, address };
+        
+        const card = document.createElement('div');
+        card.className = 'result-card';
+        
+        const dayDisplay = schedule.day || 'Unknown day';
+        const sideDisplay = schedule.side ? ` - ${schedule.side} side` : '';
+        const nextText = schedule.nextDate?.date ? `Next: ${schedule.nextDate.date}` : 'Next occurrence not found';
+        
+        card.innerHTML = `
+            <div class="schedule-day">${dayDisplay}${sideDisplay}</div>
+            <div class="schedule-time">${schedule.timeDisplay}${schedule.pattern}</div>
+            <div class="schedule-detail">${nextText}</div>
+            <div class="calendar-actions">
+                <button class="google-calendar-btn" data-schedule-id="${scheduleId}">
+                    📅 Add to Google Calendar
+                </button>
+                <a href="#" class="ics-link" data-schedule-id="${scheduleId}">Download .ics file</a>
+            </div>
+        `;
+        
+        scheduleList.appendChild(card);
+    });
+    
+    // Add event listeners
+    document.querySelectorAll('.google-calendar-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const scheduleId = this.getAttribute('data-schedule-id');
+            const data = window.scheduleData[scheduleId];
+            if (data) {
+                openGoogleCalendar(data.schedule, data.address);
+            }
+        });
+    });
+    
+    document.querySelectorAll('.ics-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const scheduleId = this.getAttribute('data-schedule-id');
+            const data = window.scheduleData[scheduleId];
+            if (data) {
+                generateCalendarEvent(data.schedule, data.address);
+            }
+        });
+    });
+    
+    showScreen('screen3');
+}
 
         // Open Google Calendar with pre-filled event
         function openGoogleCalendar(schedule, address) {
