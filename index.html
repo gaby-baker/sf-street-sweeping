@@ -461,12 +461,13 @@
             const cleaned = input.trim().toUpperCase();
             
             // Extract house number and street name
-            const match = cleaned.match(/^(\d+)\s+(.+)$/);
-            if (!match) {
-                throw new Error('Please enter address as: NUMBER STREET (e.g., 191 Haight Street)');
-            }
-            
-            const number = parseInt(match[1]);
+           const match = cleaned.match(/^(\d+[A-Z]?)\s+(.+)$/);
+if (!match) {
+    throw new Error('USER_ERROR: Please enter address as: NUMBER STREET (e.g., 191 Haight Street)');
+}
+
+// Extract just the numeric part for odd/even logic (473A → 473)
+const number = parseInt(match[1]);
             let street = match[2];
             
             // Normalize common street type abbreviations to match dataset format
