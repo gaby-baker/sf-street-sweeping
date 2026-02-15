@@ -1192,4 +1192,162 @@
                 `BEGIN:VALARM`,
                 `TRIGGER:-PT${reminder2Minutes}M`,
                 `ACTION:DISPLAY`,
-                `D
+                `DESCRIPTION:Street sweeping starts soon!`,
+                `END:VALARM`,
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\r\n');
+            
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `street-sweeping-${address.replace(/\s+/g, '-').toLowerCase()}.ics`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            showSuccessMessage();
+        }
+
+        // Show success message
+        function showSuccessMessage(text = '✅ Calendar event downloaded! Open it to add to your calendar.') {
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #48bb78;
+                color: white;
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                font-weight: 600;
+                z-index: 1000;
+                animation: slideDown 0.3s ease-out;
+            `;
+            message.textContent = text;
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.style.animation = 'slideUp 0.3s ease-out';
+                setTimeout(() => message.remove(), 300);
+            }, 3000);
+        }
+
+        // Show error message
+        function showError(message, type = 'user') {
+            console.log('showError called:', { message, type });
+            
+            // Insert into the dedicated error container
+            const container = document.getElementById('errorContainer');
+            console.log('Error container:', container);
+            
+            if (!container) {
+                console.error('Could not find errorContainer!');
+                return;
+            }
+            
+            const existing = document.querySelector('.error-message');
+            if (existing) {
+                console.log('Removing existing error');
+                existing.remove();
+            }
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            
+            // Different styling based on error type
+            if (type === 'api') {
+                // API issues - orange/warning color
+                errorDiv.innerHTML = `
+                    <strong>⚠️ Service Temporarily Unavailable</strong>
+                    <p style="margin: 8px 0 0 0; line-height: 1.5;">${message}</p>
+                    <p style="margin: 8px 0 0 0; font-size: 13px; opacity: 0.8;">This is not an issue with your location or address. The city's data service will be back soon.</p>
+                `;
+                errorDiv.style.cssText = `
+                    background: #fff3cd !important;
+                    border: 2px solid #ffc107 !important;
+                    border-radius: 10px !important;
+                    padding: 16px !important;
+                    margin-bottom: 24px !important;
+                    color: #856404 !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                    display: block !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    position: relative !important;
+                    z-index: 10000 !important;
+                `;
+            } else if (type === 'user') {
+                // User issues - red color
+                errorDiv.innerHTML = `<strong>⚠️ Error</strong><p style="margin: 8px 0 0 0; line-height: 1.5;">${message}</p>`;
+                errorDiv.style.cssText = `
+                    background: #fee !important;
+                    border: 2px solid #f44336 !important;
+                    border-radius: 10px !important;
+                    padding: 16px !important;
+                    margin-bottom: 24px !important;
+                    color: #c62828 !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                    display: block !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    position: relative !important;
+                    z-index: 10000 !important;
+                `;
+            } else {
+                // Unknown - neutral yellow
+                errorDiv.innerHTML = `<strong>⚠️ Error</strong><p style="margin: 8px 0 0 0; line-height: 1.5;">${message}</p>`;
+                errorDiv.style.cssText = `
+                    background: #fff3cd !important;
+                    border: 2px solid #ffc107 !important;
+                    border-radius: 10px !important;
+                    padding: 16px !important;
+                    margin-bottom: 24px !important;
+                    color: #856404 !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                    display: block !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    position: relative !important;
+                    z-index: 10000 !important;
+                `;
+            }
+            
+            console.log('Created error div:', errorDiv);
+            
+            // Append to dedicated error container
+            container.appendChild(errorDiv);
+            console.log('Error appended to errorContainer');
+            
+            // Error will stay visible until user tries again (no auto-remove)
+        }
+
+        // Screen navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function setLoadingText(text) {
+            document.getElementById('loadingText').textContent = text;
+        }
+
+        function backToSearch() {
+            console.log('backToSearch called - switching to screen1');
+            showScreen('screen1');
+            const input = document.getElementById('addressInput');
+            input.value = '';
+            // Don't remove errors here - let user dismiss or try again
+        }
+    </script>
+</body>
+</html>
