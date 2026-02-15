@@ -489,6 +489,11 @@ const number = parseInt(match[1]);
         // Get current GPS location
         async function findMyLocation() {
             console.log('findMyLocation called');
+            // Clear any existing errors
+    const errorContainer = document.getElementById('errorContainer');
+    if (errorContainer) {
+        errorContainer.innerHTML = '';
+    }
             const btn = document.getElementById('gpsButton');
             btn.disabled = true;
             btn.textContent = '📍 Getting location...';
@@ -617,7 +622,6 @@ const number = parseInt(match[1]);
 
                 const address = houseNumber ? `${houseNumber} ${road}` : road;
                 console.log('Final address:', address);
-                alert('GPS detected: ' + address); // TEMPORARY - shows what GPS found
                 return address;
 
             } catch (error) {
@@ -628,6 +632,14 @@ const number = parseInt(match[1]);
 
         // Manual address search
         async function searchAddress() {
+             // Clear any existing errors
+    const errorContainer = document.getElementById('errorContainer');
+    if (errorContainer) {
+        errorContainer.innerHTML = '';
+    }
+    
+    const input = document.getElementById('addressInput');
+    const address = input.value.trim();
             const input = document.getElementById('addressInput');
             const address = input.value.trim();
 
