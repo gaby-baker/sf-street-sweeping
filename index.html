@@ -458,16 +458,22 @@
 
         // Parse and normalize address
         function parseAddress(input) {
-            const cleaned = input.trim().toUpperCase();
+            let cleaned = input.trim().toUpperCase();
+            
+            // Strip everything after comma (city, state, zip)
+            // "710 Steiner St, San Francisco, CA 94117" → "710 Steiner St"
+            if (cleaned.includes(',')) {
+                cleaned = cleaned.split(',')[0].trim();
+            }
             
             // Extract house number and street name
-           const match = cleaned.match(/^(\d+[A-Z]?)\s+(.+)$/);
-if (!match) {
-    throw new Error('USER_ERROR: Please enter address as: NUMBER STREET (e.g., 710 Steiner Street)');
-}
+            const match = cleaned.match(/^(\d+[A-Z]?)\s+(.+)$/);
+            if (!match) {
+                throw new Error('USER_ERROR: Please enter address as: NUMBER STREET (e.g., 710 Steiner St)');
+            }
 
-// Extract just the numeric part for odd/even logic (473A → 473)
-const number = parseInt(match[1]);
+            // Extract just the numeric part for odd/even logic (473A → 473)
+            const number = parseInt(match[1]);
             let street = match[2];
             
             // Normalize common street type abbreviations to match dataset format
@@ -489,11 +495,13 @@ const number = parseInt(match[1]);
         // Get current GPS location
         async function findMyLocation() {
             console.log('findMyLocation called');
+            
             // Clear any existing errors
-    const errorContainer = document.getElementById('errorContainer');
-    if (errorContainer) {
-        errorContainer.innerHTML = '';
-    }
+            const errorContainer = document.getElementById('errorContainer');
+            if (errorContainer) {
+                errorContainer.innerHTML = '';
+            }
+            
             const btn = document.getElementById('gpsButton');
             btn.disabled = true;
             btn.textContent = '📍 Getting location...';
@@ -632,14 +640,12 @@ const number = parseInt(match[1]);
 
         // Manual address search
         async function searchAddress() {
-             // Clear any existing errors
-    const errorContainer = document.getElementById('errorContainer');
-    if (errorContainer) {
-        errorContainer.innerHTML = '';
-    }
-    
-    const input = document.getElementById('addressInput');
-    const address = input.value.trim();
+            // Clear any existing errors
+            const errorContainer = document.getElementById('errorContainer');
+            if (errorContainer) {
+                errorContainer.innerHTML = '';
+            }
+            
             const input = document.getElementById('addressInput');
             const address = input.value.trim();
 
@@ -656,159 +662,159 @@ const number = parseInt(match[1]);
 
         // Perform street sweeping search
         async function performSearch(address, isGPS) {
-    try {
-        currentAddress = address;
-
-        // Get CNN and side from address using new dataset
-        console.log('Getting CNN for address:', address);
-        const result = await getCNN(address);
-        
-        if (!result || !result.cnn) {
-            throw new Error('USER_ERROR: Address not found in San Francisco database. Please check the spelling and try again.');
-        }
-
-        console.log('Got CNN:', result.cnn, 'Side:', result.side);
-
-        // For GPS: get schedules for BOTH sides
-        if (isGPS) {
-            const allSchedules = [];
-            
-            // Get schedule for detected side
             try {
-                const schedulesDetected = await getStreetSweeping(result.cnn, result.side);
-                if (schedulesDetected && schedulesDetected.length > 0) {
-                    allSchedules.push(...schedulesDetected);
+                currentAddress = address;
+
+                // Get CNN and side from address using new dataset
+                console.log('Getting CNN for address:', address);
+                const result = await getCNN(address);
+                
+                if (!result || !result.cnn) {
+                    throw new Error('USER_ERROR: Address not found in San Francisco database. Please check the spelling and try again.');
                 }
+
+                console.log('Got CNN:', result.cnn, 'Side:', result.side);
+
+                // For GPS: get schedules for BOTH sides
+                if (isGPS) {
+                    const allSchedules = [];
+                    
+                    // Get schedule for detected side
+                    try {
+                        const schedulesDetected = await getStreetSweeping(result.cnn, result.side);
+                        if (schedulesDetected && schedulesDetected.length > 0) {
+                            allSchedules.push(...schedulesDetected);
+                        }
+                    } catch (error) {
+                        console.log('Could not load schedule for detected side:', error);
+                    }
+                    
+                    // Get schedule for opposite side
+                    const oppositeSide = result.side === 'L' ? 'R' : 'L';
+                    try {
+                        const schedulesOpposite = await getStreetSweeping(result.cnn, oppositeSide);
+                        if (schedulesOpposite && schedulesOpposite.length > 0) {
+                            allSchedules.push(...schedulesOpposite);
+                        }
+                    } catch (error) {
+                        console.log('Could not load schedule for opposite side:', error);
+                    }
+                    
+                    if (allSchedules.length === 0) {
+                        throw new Error('USER_ERROR: No street sweeping schedules found for this address.');
+                    }
+                    
+                    // Show results with both sides
+                    displayResults(address, allSchedules, isGPS);
+                    
+                } else {
+                    // For manual entry: get schedule for only the entered side
+                    const schedules = await getStreetSweeping(result.cnn, result.side);
+
+                    if (!schedules || schedules.length === 0) {
+                        throw new Error('USER_ERROR: No street sweeping schedules found for this address.');
+                    }
+
+                    // Show results
+                    displayResults(address, schedules, isGPS);
+                }
+
             } catch (error) {
-                console.log('Could not load schedule for detected side:', error);
+                console.error('Search error:', error);
+                
+                // Determine if it's an API issue or user issue
+                if (error.message.startsWith('API_BLOCKED:')) {
+                    const cleanMessage = error.message.replace('API_BLOCKED: ', '');
+                    showError(cleanMessage, 'api');
+                } else if (error.message.startsWith('USER_ERROR:')) {
+                    const cleanMessage = error.message.replace('USER_ERROR: ', '');
+                    showError(cleanMessage, 'user');
+                } else {
+                    showError(error.message || 'An error occurred while searching', 'unknown');
+                }
+                
+                backToSearch();
             }
-            
-            // Get schedule for opposite side
-            const oppositeSide = result.side === 'L' ? 'R' : 'L';
+        }
+
+        // Get CNN from address using List of Streets and Intersections dataset
+        async function getCNN(searchAddress) {
             try {
-                const schedulesOpposite = await getStreetSweeping(result.cnn, oppositeSide);
-                if (schedulesOpposite && schedulesOpposite.length > 0) {
-                    allSchedules.push(...schedulesOpposite);
+                console.log('Parsing address:', searchAddress);
+                
+                // Parse address into number and street name
+                const { number: houseNumber, street: streetName } = parseAddress(searchAddress);
+                console.log('Parsed:', { houseNumber, streetName });
+                
+                // Search for street name in Streets and Intersections dataset
+                const url = `https://data.sfgov.org/resource/pu5n-qu5c.json?streetname=${encodeURIComponent(streetName)}`;
+                console.log('Searching:', url);
+                
+                const response = await fetch(url);
+                
+                if (response.status === 403 || response.status === 404) {
+                    throw new Error('API_BLOCKED: The San Francisco data service cannot be reached. This is a temporary issue with the city\'s servers. Please try again later.');
                 }
+                
+                if (!response.ok) {
+                    throw new Error('API_BLOCKED: The San Francisco data service is experiencing issues. Please try again in a few hours.');
+                }
+                
+                const segments = await response.json();
+                console.log('Found segments:', segments.length);
+                
+                if (!segments || segments.length === 0) {
+                    throw new Error(`USER_ERROR: Street "${streetName}" not found. Please check the spelling and make sure to include the street type (St, Ave, Blvd, etc.).`);
+                }
+                
+                // Determine if address is odd or even
+                const isAddressOdd = houseNumber % 2 === 1;
+                console.log('Address', houseNumber, 'is', isAddressOdd ? 'odd' : 'even');
+                
+                // Find segment where house number falls in range
+                for (const segment of segments) {
+                    // Skip intersection records (no address ranges)
+                    if (!segment.lf_fadd || !segment.rt_fadd) continue;
+                    
+                    const leftMin = parseInt(segment.lf_fadd);
+                    const leftMax = parseInt(segment.lf_tadd);
+                    const rightMin = parseInt(segment.rt_fadd);
+                    const rightMax = parseInt(segment.rt_tadd);
+                    
+                    // Determine which side has odd numbers
+                    const isLeftSideOdd = leftMin % 2 === 1;
+                    const isRightSideOdd = rightMin % 2 === 1;
+                    
+                    console.log('Segment:', leftMin, '-', leftMax, '(left)', rightMin, '-', rightMax, '(right)');
+                    console.log('Left side is', isLeftSideOdd ? 'odd' : 'even', ', Right side is', isRightSideOdd ? 'odd' : 'even');
+                    
+                    // Check if address falls in left side range AND has matching parity
+                    if (houseNumber >= leftMin && houseNumber <= leftMax && isAddressOdd === isLeftSideOdd) {
+                        console.log('Match found! Address is on LEFT side (L)');
+                        return { cnn: segment.cnn, side: 'L' };
+                    }
+                    
+                    // Check if address falls in right side range AND has matching parity
+                    if (houseNumber >= rightMin && houseNumber <= rightMax && isAddressOdd === isRightSideOdd) {
+                        console.log('Match found! Address is on RIGHT side (R)');
+                        return { cnn: segment.cnn, side: 'R' };
+                    }
+                }
+                
+                // No matching range found
+                throw new Error(`USER_ERROR: Address ${houseNumber} ${streetName} not found. Please check the house number is correct.`);
+                
             } catch (error) {
-                console.log('Could not load schedule for opposite side:', error);
-            }
-            
-            if (allSchedules.length === 0) {
-                throw new Error('USER_ERROR: No street sweeping schedules found for this address.');
-            }
-            
-            // Show results with both sides
-            displayResults(address, allSchedules, isGPS);
-            
-        } else {
-            // For manual entry: get schedule for only the entered side
-            const schedules = await getStreetSweeping(result.cnn, result.side);
-
-            if (!schedules || schedules.length === 0) {
-                throw new Error('USER_ERROR: No street sweeping schedules found for this address.');
-            }
-
-            // Show results
-            displayResults(address, schedules, isGPS);
-        }
-
-    } catch (error) {
-        console.error('Search error:', error);
-        
-        // Determine if it's an API issue or user issue
-        if (error.message.startsWith('API_BLOCKED:')) {
-            const cleanMessage = error.message.replace('API_BLOCKED: ', '');
-            showError(cleanMessage, 'api');
-        } else if (error.message.startsWith('USER_ERROR:')) {
-            const cleanMessage = error.message.replace('USER_ERROR: ', '');
-            showError(cleanMessage, 'user');
-        } else {
-            showError(error.message || 'An error occurred while searching', 'unknown');
-        }
-        
-        backToSearch();
-    }
-}
-
-       // Get CNN from address using List of Streets and Intersections dataset
-async function getCNN(searchAddress) {
-    try {
-        console.log('Parsing address:', searchAddress);
-        
-        // Parse address into number and street name
-        const { number: houseNumber, street: streetName } = parseAddress(searchAddress);
-        console.log('Parsed:', { houseNumber, streetName });
-        
-        // Search for street name in Streets and Intersections dataset
-        const url = `https://data.sfgov.org/resource/pu5n-qu5c.json?streetname=${encodeURIComponent(streetName)}`;
-        console.log('Searching:', url);
-        
-        const response = await fetch(url);
-        
-        if (response.status === 403 || response.status === 404) {
-            throw new Error('API_BLOCKED: The San Francisco data service cannot be reached. This is a temporary issue with the city\'s servers. Please try again later.');
-        }
-        
-        if (!response.ok) {
-            throw new Error('API_BLOCKED: The San Francisco data service is experiencing issues. Please try again in a few hours.');
-        }
-        
-        const segments = await response.json();
-        console.log('Found segments:', segments.length);
-        
-        if (!segments || segments.length === 0) {
-            throw new Error(`USER_ERROR: Street "${streetName}" not found. Please check the spelling and make sure to include the street type (St, Ave, Blvd, etc.).`);
-        }
-        
-        // Determine if address is odd or even
-        const isAddressOdd = houseNumber % 2 === 1;
-        console.log('Address', houseNumber, 'is', isAddressOdd ? 'odd' : 'even');
-        
-        // Find segment where house number falls in range
-        for (const segment of segments) {
-            // Skip intersection records (no address ranges)
-            if (!segment.lf_fadd || !segment.rt_fadd) continue;
-            
-            const leftMin = parseInt(segment.lf_fadd);
-            const leftMax = parseInt(segment.lf_tadd);
-            const rightMin = parseInt(segment.rt_fadd);
-            const rightMax = parseInt(segment.rt_tadd);
-            
-            // Determine which side has odd numbers
-            const isLeftSideOdd = leftMin % 2 === 1;
-            const isRightSideOdd = rightMin % 2 === 1;
-            
-            console.log('Segment:', leftMin, '-', leftMax, '(left)', rightMin, '-', rightMax, '(right)');
-            console.log('Left side is', isLeftSideOdd ? 'odd' : 'even', ', Right side is', isRightSideOdd ? 'odd' : 'even');
-            
-            // Check if address falls in left side range AND has matching parity
-            if (houseNumber >= leftMin && houseNumber <= leftMax && isAddressOdd === isLeftSideOdd) {
-                console.log('Match found! Address is on LEFT side (L)');
-                return { cnn: segment.cnn, side: 'L' };
-            }
-            
-            // Check if address falls in right side range AND has matching parity
-            if (houseNumber >= rightMin && houseNumber <= rightMax && isAddressOdd === isRightSideOdd) {
-                console.log('Match found! Address is on RIGHT side (R)');
-                return { cnn: segment.cnn, side: 'R' };
+                // Re-throw API_BLOCKED and USER_ERROR as-is
+                if (error.message.startsWith('API_BLOCKED:') || error.message.startsWith('USER_ERROR:')) {
+                    throw error;
+                }
+                // Wrap other errors
+                throw new Error('API_BLOCKED: Cannot connect to San Francisco data service. Please check your internet connection and try again.');
             }
         }
-        
-        // No matching range found
-        throw new Error(`USER_ERROR: Address ${houseNumber} ${streetName} not found. Please check the house number is correct.`);
-        
-    } catch (error) {
-        // Re-throw API_BLOCKED and USER_ERROR as-is
-        if (error.message.startsWith('API_BLOCKED:') || error.message.startsWith('USER_ERROR:')) {
-            throw error;
-        }
-        // Wrap other errors
-        throw new Error('API_BLOCKED: Cannot connect to San Francisco data service. Please check your internet connection and try again.');
-    }
-}
 
-        // Get street sweeping schedules (now with side filter)
+        // Get street sweeping schedules (now with parent CNN fallback)
         async function getStreetSweeping(cnn, side) {
             try {
                 // Query with CNN and side filter (L for left/odd, R for right/even)
@@ -826,7 +832,28 @@ async function getCNN(searchAddress) {
                 }
                 
                 const data = await response.json();
-                console.log('Street sweeping records:', data.length);
+                console.log('Street sweeping records for', cnn, ':', data.length);
+                
+                // If no data found and CNN ends in non-000, try parent CNN
+                if ((!data || data.length === 0) && !cnn.endsWith('000')) {
+                    console.log('No data for child CNN, trying parent...');
+                    
+                    // Get parent CNN by replacing last 3 digits with 000
+                    const parentCnn = cnn.slice(0, -3) + '000';
+                    console.log('Parent CNN:', parentCnn);
+                    
+                    const parentUrl = `https://data.sfgov.org/resource/yhqp-riqs.json?cnn=${parentCnn}&cnnrightleft=${side}`;
+                    const parentResponse = await fetch(parentUrl);
+                    
+                    if (parentResponse.ok) {
+                        const parentData = await parentResponse.json();
+                        console.log('Parent CNN records:', parentData.length);
+                        
+                        if (parentData && parentData.length > 0) {
+                            return processSchedules(parentData);
+                        }
+                    }
+                }
                 
                 if (!data || data.length === 0) {
                     throw new Error('USER_ERROR: No street sweeping schedule found for this side of the street. This may be a private street or not subject to street sweeping.');
@@ -891,23 +918,23 @@ async function getCNN(searchAddress) {
         }
 
         // Calculate next occurrence
-function calculateNextOccurrence(schedule) {
-    // Map abbreviated day names to full names
-    const dayMap = {
-        'Sun': 'Sunday',
-        'Mon': 'Monday',
-        'Tues': 'Tuesday',
-        'Wed': 'Wednesday',
-        'Thu': 'Thursday',
-        'Fri': 'Friday',
-        'Sat': 'Saturday'
-    };
-    
-    // Convert abbreviated day to full name if needed
-    const fullDay = dayMap[schedule.day] || schedule.day;
-    
-    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const targetDay = daysOfWeek.indexOf(fullDay);
+        function calculateNextOccurrence(schedule) {
+            // Map abbreviated day names to full names
+            const dayMap = {
+                'Sun': 'Sunday',
+                'Mon': 'Monday',
+                'Tues': 'Tuesday',
+                'Wed': 'Wednesday',
+                'Thu': 'Thursday',
+                'Fri': 'Friday',
+                'Sat': 'Saturday'
+            };
+            
+            // Convert abbreviated day to full name if needed
+            const fullDay = dayMap[schedule.day] || schedule.day;
+            
+            const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const targetDay = daysOfWeek.indexOf(fullDay);
             
             if (targetDay === -1) return null;
             
@@ -976,85 +1003,85 @@ function calculateNextOccurrence(schedule) {
         }
 
         // Display results
-function displayResults(address, schedules, isGPS) {
-    document.getElementById('detectedAddress').textContent = address.toUpperCase();
-    document.getElementById('addressLabel').textContent = isGPS ? '📍 Detected Location' : '📍 Your Address';
-    
-    const scheduleList = document.getElementById('scheduleList');
-    scheduleList.innerHTML = '';
-    
-    // Add GPS warning message if using GPS
-    if (isGPS) {
-        const warning = document.createElement('div');
-        warning.className = 'gps-warning';
-        warning.innerHTML = `
-            <div style="background: #e3f2fd; border: 2px solid #90caf9; border-radius: 10px; padding: 16px; margin-bottom: 24px; color: #1565c0; font-size: 14px; line-height: 1.5;">
-                🔍 GPS may not be precise. Both sides of the street shown below:
-            </div>
-        `;
-        scheduleList.appendChild(warning);
-    }
-    
-    schedules.forEach((schedule, index) => {
-        const scheduleId = `schedule_${Date.now()}_${index}`;
-        window.scheduleData[scheduleId] = { schedule, address };
-        
-        const card = document.createElement('div');
-        card.className = 'result-card';
-        
-        // Convert abbreviated day names to full names for display
-const dayMap = {
-    'Sun': 'Sunday',
-    'Mon': 'Monday', 
-    'Tues': 'Tuesday',
-    'Wed': 'Wednesday',
-    'Thu': 'Thursday',
-    'Fri': 'Friday',
-    'Sat': 'Saturday'
-};
-const fullDay = dayMap[schedule.day] || schedule.day;
-const sideDisplay = schedule.side ? `${schedule.side} side` : 'Unknown side';
-const nextText = schedule.nextDate?.date ? `Next: ${schedule.nextDate.date}` : 'Next occurrence not found';
+        function displayResults(address, schedules, isGPS) {
+            document.getElementById('detectedAddress').textContent = address.toUpperCase();
+            document.getElementById('addressLabel').textContent = isGPS ? '📍 Detected Location' : '📍 Your Address';
+            
+            const scheduleList = document.getElementById('scheduleList');
+            scheduleList.innerHTML = '';
+            
+            // Add GPS warning message if using GPS
+            if (isGPS) {
+                const warning = document.createElement('div');
+                warning.className = 'gps-warning';
+                warning.innerHTML = `
+                    <div style="background: #e3f2fd; border: 2px solid #90caf9; border-radius: 10px; padding: 16px; margin-bottom: 24px; color: #1565c0; font-size: 14px; line-height: 1.5;">
+                        🔍 GPS may not be precise. Both sides of the street shown below:
+                    </div>
+                `;
+                scheduleList.appendChild(warning);
+            }
+            
+            schedules.forEach((schedule, index) => {
+                const scheduleId = `schedule_${Date.now()}_${index}`;
+                window.scheduleData[scheduleId] = { schedule, address };
+                
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                
+                // Convert abbreviated day names to full names for display
+                const dayMap = {
+                    'Sun': 'Sunday',
+                    'Mon': 'Monday', 
+                    'Tues': 'Tuesday',
+                    'Wed': 'Wednesday',
+                    'Thu': 'Thursday',
+                    'Fri': 'Friday',
+                    'Sat': 'Saturday'
+                };
+                const fullDay = dayMap[schedule.day] || schedule.day;
+                const sideDisplay = schedule.side ? `${schedule.side} side` : 'Unknown side';
+                const nextText = schedule.nextDate?.date ? `Next: ${schedule.nextDate.date}` : 'Next occurrence not found';
 
-card.innerHTML = `
-    <div class="schedule-day">${sideDisplay}</div>
-    <div class="schedule-time">${fullDay} – ${schedule.timeDisplay}${schedule.pattern}</div>
-    <div class="schedule-detail">${nextText}</div>
-    <div class="calendar-actions">
-                <button class="google-calendar-btn" data-schedule-id="${scheduleId}">
-                    📅 Add to Google Calendar
-                </button>
-                <a href="#" class="ics-link" data-schedule-id="${scheduleId}">Download .ics file</a>
-            </div>
-        `;
-        
-        scheduleList.appendChild(card);
-    });
-    
-    // Add event listeners
-    document.querySelectorAll('.google-calendar-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const scheduleId = this.getAttribute('data-schedule-id');
-            const data = window.scheduleData[scheduleId];
-            if (data) {
-                openGoogleCalendar(data.schedule, data.address);
-            }
-        });
-    });
-    
-    document.querySelectorAll('.ics-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const scheduleId = this.getAttribute('data-schedule-id');
-            const data = window.scheduleData[scheduleId];
-            if (data) {
-                generateCalendarEvent(data.schedule, data.address);
-            }
-        });
-    });
-    
-    showScreen('screen3');
-}
+                card.innerHTML = `
+                    <div class="schedule-day">${sideDisplay}</div>
+                    <div class="schedule-time">${fullDay} – ${schedule.timeDisplay}${schedule.pattern}</div>
+                    <div class="schedule-detail">${nextText}</div>
+                    <div class="calendar-actions">
+                        <button class="google-calendar-btn" data-schedule-id="${scheduleId}">
+                            📅 Add to Google Calendar
+                        </button>
+                        <a href="#" class="ics-link" data-schedule-id="${scheduleId}">Download .ics file</a>
+                    </div>
+                `;
+                
+                scheduleList.appendChild(card);
+            });
+            
+            // Add event listeners
+            document.querySelectorAll('.google-calendar-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const scheduleId = this.getAttribute('data-schedule-id');
+                    const data = window.scheduleData[scheduleId];
+                    if (data) {
+                        openGoogleCalendar(data.schedule, data.address);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.ics-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const scheduleId = this.getAttribute('data-schedule-id');
+                    const data = window.scheduleData[scheduleId];
+                    if (data) {
+                        generateCalendarEvent(data.schedule, data.address);
+                    }
+                });
+            });
+            
+            showScreen('screen3');
+        }
 
         // Open Google Calendar with pre-filled event
         function openGoogleCalendar(schedule, address) {
@@ -1165,162 +1192,4 @@ card.innerHTML = `
                 `BEGIN:VALARM`,
                 `TRIGGER:-PT${reminder2Minutes}M`,
                 `ACTION:DISPLAY`,
-                `DESCRIPTION:Street sweeping starts soon!`,
-                `END:VALARM`,
-                'END:VEVENT',
-                'END:VCALENDAR'
-            ].join('\r\n');
-            
-            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `street-sweeping-${address.replace(/\s+/g, '-').toLowerCase()}.ics`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-            
-            showSuccessMessage();
-        }
-
-        // Show success message
-        function showSuccessMessage(text = '✅ Calendar event downloaded! Open it to add to your calendar.') {
-            const message = document.createElement('div');
-            message.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: #48bb78;
-                color: white;
-                padding: 16px 24px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                font-weight: 600;
-                z-index: 1000;
-                animation: slideDown 0.3s ease-out;
-            `;
-            message.textContent = text;
-            document.body.appendChild(message);
-            
-            setTimeout(() => {
-                message.style.animation = 'slideUp 0.3s ease-out';
-                setTimeout(() => message.remove(), 300);
-            }, 3000);
-        }
-
-        // Show error message
-        function showError(message, type = 'user') {
-            console.log('showError called:', { message, type });
-            
-            // Insert into the dedicated error container
-            const container = document.getElementById('errorContainer');
-            console.log('Error container:', container);
-            
-            if (!container) {
-                console.error('Could not find errorContainer!');
-                return;
-            }
-            
-            const existing = document.querySelector('.error-message');
-            if (existing) {
-                console.log('Removing existing error');
-                existing.remove();
-            }
-            
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            
-            // Different styling based on error type
-            if (type === 'api') {
-                // API issues - orange/warning color
-                errorDiv.innerHTML = `
-                    <strong>⚠️ Service Temporarily Unavailable</strong>
-                    <p style="margin: 8px 0 0 0; line-height: 1.5;">${message}</p>
-                    <p style="margin: 8px 0 0 0; font-size: 13px; opacity: 0.8;">This is not an issue with your location or address. The city's data service will be back soon.</p>
-                `;
-                errorDiv.style.cssText = `
-                    background: #fff3cd !important;
-                    border: 2px solid #ffc107 !important;
-                    border-radius: 10px !important;
-                    padding: 16px !important;
-                    margin-bottom: 24px !important;
-                    color: #856404 !important;
-                    width: 100% !important;
-                    box-sizing: border-box !important;
-                    display: block !important;
-                    visibility: visible !important;
-                    opacity: 1 !important;
-                    position: relative !important;
-                    z-index: 10000 !important;
-                `;
-            } else if (type === 'user') {
-                // User issues - red color
-                errorDiv.innerHTML = `<strong>⚠️ Error</strong><p style="margin: 8px 0 0 0; line-height: 1.5;">${message}</p>`;
-                errorDiv.style.cssText = `
-                    background: #fee !important;
-                    border: 2px solid #f44336 !important;
-                    border-radius: 10px !important;
-                    padding: 16px !important;
-                    margin-bottom: 24px !important;
-                    color: #c62828 !important;
-                    width: 100% !important;
-                    box-sizing: border-box !important;
-                    display: block !important;
-                    visibility: visible !important;
-                    opacity: 1 !important;
-                    position: relative !important;
-                    z-index: 10000 !important;
-                `;
-            } else {
-                // Unknown - neutral yellow
-                errorDiv.innerHTML = `<strong>⚠️ Error</strong><p style="margin: 8px 0 0 0; line-height: 1.5;">${message}</p>`;
-                errorDiv.style.cssText = `
-                    background: #fff3cd !important;
-                    border: 2px solid #ffc107 !important;
-                    border-radius: 10px !important;
-                    padding: 16px !important;
-                    margin-bottom: 24px !important;
-                    color: #856404 !important;
-                    width: 100% !important;
-                    box-sizing: border-box !important;
-                    display: block !important;
-                    visibility: visible !important;
-                    opacity: 1 !important;
-                    position: relative !important;
-                    z-index: 10000 !important;
-                `;
-            }
-            
-            console.log('Created error div:', errorDiv);
-            
-            // Append to dedicated error container
-            container.appendChild(errorDiv);
-            console.log('Error appended to errorContainer');
-            
-            // Error will stay visible until user tries again (no auto-remove)
-        }
-
-        // Screen navigation
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        function setLoadingText(text) {
-            document.getElementById('loadingText').textContent = text;
-        }
-
-        function backToSearch() {
-            console.log('backToSearch called - switching to screen1');
-            showScreen('screen1');
-            const input = document.getElementById('addressInput');
-            input.value = '';
-            // Don't remove errors here - let user dismiss or try again
-        }
-    </script>
-</body>
-</html>
+                `D
