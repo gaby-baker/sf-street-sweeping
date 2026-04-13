@@ -52,6 +52,14 @@
             z-index: 1000;
         }
 
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #3e4234;
+            text-align: center;
+            margin: 0 0 16px 0;
+        }
+
         .gps-button {
             width: 100%;
             background: #5a8a5a;
@@ -285,7 +293,7 @@
             gap: 12px;
         }
 
-        .google-calendar-btn {
+        .add-to-calendar-btn {
             background: #5a8a5a;
             color: white;
             border: none;
@@ -296,24 +304,34 @@
             cursor: pointer;
             transition: all 0.2s;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
         }
 
-        .google-calendar-btn:hover {
+        .add-to-calendar-btn:hover {
             background: #6b9b6b;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
-        .ics-link {
-            color: #6b7254;
-            font-size: 13px;
-            text-decoration: none;
+        .picker-ics-btn {
+            display: block;
+            width: 100%;
+            background: transparent;
+            color: #5a8a5a;
+            border: 2px solid #5a8a5a;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
             text-align: center;
-            transition: color 0.2s;
+            text-decoration: none;
+            box-sizing: border-box;
         }
 
-        .ics-link:hover {
-            color: #5a8a5a;
-            text-decoration: underline;
+        .picker-ics-btn:hover {
+            background: #f0f5f0;
         }
 
         .new-search-btn {
@@ -374,6 +392,95 @@
                 transform: translateX(-50%) translateY(-20px);
             }
         }
+
+        .picker-box {
+            display: none;
+            background: #f5f3ed;
+            border: 2px solid #d4d0c4;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .picker-box.active {
+            display: block;
+        }
+
+        .picker-header {
+            font-size: 15px;
+            font-weight: 600;
+            color: #3e4234;
+            margin-bottom: 12px;
+        }
+
+        .picker-custom-label {
+            font-size: 13px;
+            color: #6b7254;
+            margin-bottom: 8px;
+        }
+
+        .picker-field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .picker-field label {
+            font-size: 14px;
+            color: #3e4234;
+            font-weight: 600;
+            min-width: 44px;
+        }
+
+        .picker-field input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #d4d0c4;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            background: white;
+            color: #3e4234;
+        }
+
+        .picker-field input:focus {
+            outline: none;
+            border-color: #5a8a5a;
+        }
+
+        .picker-confirm-btn {
+            width: 100%;
+            background: #5a8a5a;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 4px;
+        }
+
+        .picker-confirm-btn:hover {
+            background: #6b9b6b;
+        }
+
+        .picker-default-link {
+            display: block;
+            text-align: center;
+            color: #6b7254;
+            font-size: 13px;
+            text-decoration: none;
+            margin-top: 10px;
+            transition: color 0.2s;
+        }
+
+        .picker-default-link:hover {
+            color: #5a8a5a;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -391,13 +498,13 @@
             <!-- Screen 1: Landing -->
             <div id="screen1" class="screen active">
             <button class="gps-button" id="gpsButton" onclick="findMyLocation()">
-                📍 Find My Location With GPS
+                📍 Find My Sweeping Schedule with GPS
             </button>
 
             <div class="divider">or</div>
 
             <button class="manual-toggle" onclick="toggleManual()">
-                Enter address manually ▼
+                Enter your parking address ▼
             </button>
 
                 <div style="text-align: center; margin-top: 16px; font-size: 13px; color: #6b7254;">
@@ -406,7 +513,7 @@
 
             <div id="manualSection" class="manual-section">
                 <div class="input-group">
-                    <label for="addressInput">Street Address</label>
+                    <label for="addressInput">Your Parked Car's Address</label>
                     <input 
                         type="text" 
                         id="addressInput" 
@@ -444,16 +551,15 @@
     <script>
         // Global state
         let currentAddress = '';
-        window.scheduleData = {};
 
         // Toggle manual entry section
         function toggleManual() {
             const section = document.getElementById('manualSection');
             const btn = document.querySelector('.manual-toggle');
             section.classList.toggle('active');
-            btn.textContent = section.classList.contains('active') 
-                ? 'Hide manual entry ▲' 
-                : 'Enter address manually ▼';
+            btn.textContent = section.classList.contains('active')
+                ? 'Hide manual entry ▲'
+                : 'Enter your parking address ▼';
         }
 
         // Parse and normalize address
@@ -551,7 +657,7 @@
                 backToSearch();
             } finally {
                 btn.disabled = false;
-                btn.textContent = '📍 Find My Location With GPS';
+                btn.textContent = '📍 Find My Sweeping Schedule with GPS';
             }
         }
 
@@ -1022,17 +1128,14 @@
                 scheduleList.appendChild(warning);
             }
             
-            schedules.forEach((schedule, index) => {
-                const scheduleId = `schedule_${Date.now()}_${index}`;
-                window.scheduleData[scheduleId] = { schedule, address };
-                
+            schedules.forEach((schedule) => {
                 const card = document.createElement('div');
                 card.className = 'result-card';
-                
+
                 // Convert abbreviated day names to full names for display
                 const dayMap = {
                     'Sun': 'Sunday',
-                    'Mon': 'Monday', 
+                    'Mon': 'Monday',
                     'Tues': 'Tuesday',
                     'Wed': 'Wednesday',
                     'Thu': 'Thursday',
@@ -1042,162 +1145,180 @@
                 const fullDay = dayMap[schedule.day] || schedule.day;
                 const sideDisplay = schedule.side ? `${schedule.side} side` : 'Unknown side';
                 const nextText = schedule.nextDate?.date ? `Next: ${schedule.nextDate.date}` : 'Next occurrence not found';
+                const defaultDT = getDefaultReminderDateTime(schedule);
 
                 card.innerHTML = `
                     <div class="schedule-day">${sideDisplay}</div>
                     <div class="schedule-time">${fullDay} – ${schedule.timeDisplay}${schedule.pattern}</div>
                     <div class="schedule-detail">${nextText}</div>
                     <div class="calendar-actions">
-                        <button class="google-calendar-btn" data-schedule-id="${scheduleId}">
-                            📅 Add to Google Calendar
+                        <button class="add-to-calendar-btn">
+                            📅 Add to Calendar
                         </button>
-                        <a href="#" class="ics-link" data-schedule-id="${scheduleId}">Download .ics file</a>
+                        <div class="picker-box shared-picker">
+                            <div class="picker-header">🗓️ When to remind you?</div>
+                            <div class="picker-field">
+                                <label>Date:</label>
+                                <input type="date" class="picker-date" value="${defaultDT.date}">
+                            </div>
+                            <div class="picker-field">
+                                <label>Time:</label>
+                                <input type="time" class="picker-time" value="${defaultDT.time}">
+                            </div>
+                            <button class="picker-confirm-btn gcal-confirm">Add to Google Calendar</button>
+                            <a href="#" class="picker-ics-btn ics-confirm">Download .ics file</a>
+                        </div>
                     </div>
                 `;
-                
+
                 scheduleList.appendChild(card);
-            });
-            
-            // Add event listeners
-            document.querySelectorAll('.google-calendar-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const scheduleId = this.getAttribute('data-schedule-id');
-                    const data = window.scheduleData[scheduleId];
-                    if (data) {
-                        openGoogleCalendar(data.schedule, data.address);
-                    }
-                });
-            });
-            
-            document.querySelectorAll('.ics-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const scheduleId = this.getAttribute('data-schedule-id');
-                    const data = window.scheduleData[scheduleId];
-                    if (data) {
-                        generateCalendarEvent(data.schedule, data.address);
-                    }
-                });
+                bindCardEvents(card, schedule, address);
             });
             
             showScreen('screen3');
         }
 
-        // Open Google Calendar with pre-filled event
-        function openGoogleCalendar(schedule, address) {
+        // Get default reminder date/time (8pm night before sweeping)
+        function getDefaultReminderDateTime(schedule) {
             if (!schedule.nextDate?.actualDate) {
-                alert('Cannot create calendar event - no valid date found.');
-                return;
+                return { date: '', time: '17:00', displayText: 'Use default time for reminder' };
             }
-            
-            const eventDate = new Date(schedule.nextDate.actualDate);
-            const dayName = schedule.day || schedule.weekday || 'Street Sweeping';
-            const sideName = schedule.side ? ` (${schedule.side} side)` : '';
-            const timeRange = schedule.timeDisplay || '';
-            
-            const startTimeStr = schedule.times?.[0]?.fromStr || '8';
-            const endTimeStr = schedule.times?.[0]?.toStr || '10';
-            const startHour = parseInt(startTimeStr);
-            const endHour = parseInt(endTimeStr);
-            
-            const eventStart = new Date(eventDate);
-            eventStart.setHours(startHour, 0, 0, 0);
-            
-            const eventEnd = new Date(eventDate);
-            eventEnd.setHours(endHour, 0, 0, 0);
-            
+            const sweepDate = new Date(schedule.nextDate.actualDate);
+            const reminderDate = new Date(sweepDate);
+            reminderDate.setDate(reminderDate.getDate() - 1);
+            const pad = (n) => n.toString().padStart(2, '0');
+            const dateStr = `${reminderDate.getFullYear()}-${pad(reminderDate.getMonth() + 1)}-${pad(reminderDate.getDate())}`;
+            const displayDate = reminderDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            return {
+                date: dateStr,
+                time: '17:00',
+                displayText: `Use default time for reminder (${displayDate} at 5:00 PM)`
+            };
+        }
+
+        // Bind picker interactions for a result card
+        function bindCardEvents(card, schedule, address) {
+            const toggleBtn = card.querySelector('.add-to-calendar-btn');
+            const picker = card.querySelector('.shared-picker');
+
+            toggleBtn.addEventListener('click', () => {
+                picker.classList.toggle('active');
+            });
+
+            card.querySelector('.gcal-confirm').addEventListener('click', () => {
+                const date = picker.querySelector('.picker-date').value;
+                const time = picker.querySelector('.picker-time').value;
+                if (!date || !time) { alert('Please select a date and time.'); return; }
+                openGoogleCalendar(schedule, address, date, time);
+                picker.classList.remove('active');
+            });
+
+            card.querySelector('.ics-confirm').addEventListener('click', (e) => {
+                e.preventDefault();
+                const date = picker.querySelector('.picker-date').value;
+                const time = picker.querySelector('.picker-time').value;
+                if (!date || !time) { alert('Please select a date and time.'); return; }
+                generateCalendarEvent(schedule, address, date, time);
+                picker.classList.remove('active');
+            });
+        }
+
+        // Open Google Calendar with pre-filled event
+        function openGoogleCalendar(schedule, address, customDate, customTime) {
+            const [year, month, day] = customDate.split('-').map(Number);
+            const [hours, minutes] = customTime.split(':').map(Number);
+
+            const eventStart = new Date(year, month - 1, day, hours, minutes, 0);
+            const eventEnd = new Date(eventStart);
+            eventEnd.setHours(eventEnd.getHours() + 1);
+
+            const sweepDate = schedule.nextDate?.actualDate ? new Date(schedule.nextDate.actualDate) : null;
+            const sweepDateFormatted = sweepDate
+                ? sweepDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
+                : 'Unknown date';
+            const sideText = schedule.side ? ` (${schedule.side} side)` : '';
+            const description = `Street sweeping at ${address.toUpperCase()}${sideText}\nDay: ${sweepDateFormatted}\nTime: ${schedule.timeDisplay || ''}\n\nRemember to move your car before sweeping starts!`;
+
             const formatGoogleDate = (date) => {
                 const pad = (n) => n.toString().padStart(2, '0');
-                return date.getFullYear() + 
-                       pad(date.getMonth() + 1) + 
-                       pad(date.getDate()) + 
-                       'T' + 
-                       pad(date.getHours()) + 
-                       pad(date.getMinutes()) + 
+                return date.getFullYear() +
+                       pad(date.getMonth() + 1) +
+                       pad(date.getDate()) +
+                       'T' +
+                       pad(date.getHours()) +
+                       pad(date.getMinutes()) +
                        pad(date.getSeconds());
             };
-            
+
             const params = new URLSearchParams({
                 action: 'TEMPLATE',
                 text: 'Move Car - Street Sweeping',
                 dates: `${formatGoogleDate(eventStart)}/${formatGoogleDate(eventEnd)}`,
-                details: `Street sweeping at ${address}${sideName}\nTime: ${timeRange}\n\n⚠️ Don't forget to set reminders! Suggested:\n• 6pm the night before\n• 30 minutes before\n\nRemember to move your car before sweeping starts!`,
+                details: description,
                 location: address
             });
-            
-            const googleCalendarUrl = `https://calendar.google.com/calendar/render?${params.toString()}`;
-            window.open(googleCalendarUrl, '_blank');
-            
+
+            window.open(`https://calendar.google.com/calendar/render?${params.toString()}`, '_blank');
             showSuccessMessage('Opening Google Calendar...');
         }
 
         // Generate and download .ics calendar file
-        function generateCalendarEvent(schedule, address) {
-            if (!schedule.nextDate?.actualDate) {
-                alert('Cannot create calendar event - no valid date found.');
-                return;
-            }
-            
-            const eventDate = new Date(schedule.nextDate.actualDate);
-            const dayName = schedule.day || schedule.weekday || 'Street Sweeping';
-            const sideName = schedule.side ? ` (${schedule.side} side)` : '';
-            const timeRange = schedule.timeDisplay || '';
-            
-            const startTimeStr = schedule.times?.[0]?.fromStr || '8';
-            const startHour = parseInt(startTimeStr);
-            
-            const eventStart = new Date(eventDate);
-            eventStart.setHours(startHour, 0, 0, 0);
-            
+        function generateCalendarEvent(schedule, address, customDate, customTime) {
+            const [year, month, day] = customDate.split('-').map(Number);
+            const [hours, minutes] = customTime.split(':').map(Number);
+
+            const eventStart = new Date(year, month - 1, day, hours, minutes, 0);
             const eventEnd = new Date(eventStart);
-            eventEnd.setHours(startHour + 2, 0, 0, 0);
-            
-            // Reminder 1: 6pm the night before
-            const reminder1 = new Date(eventDate);
-            reminder1.setDate(reminder1.getDate() - 1);
-            reminder1.setHours(18, 0, 0, 0);
-            const reminder1Minutes = Math.floor((eventStart - reminder1) / 1000 / 60);
-            
-            // Reminder 2: 30 minutes before
-            const reminder2Minutes = 30;
-            
+            eventEnd.setHours(eventEnd.getHours() + 1);
+
+            const sweepDate = schedule.nextDate?.actualDate ? new Date(schedule.nextDate.actualDate) : null;
+            const sweepDateFormatted = sweepDate
+                ? sweepDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
+                : 'Unknown date';
+            const sideText = schedule.side ? ` (${schedule.side} side)` : '';
+            const escapedAddress = address.toUpperCase().replace(/,/g, '\\,');
+            const escapedDate = sweepDateFormatted.replace(/,/g, '\\,');
+            const description = `Street sweeping at ${escapedAddress}${sideText}\\nDay: ${escapedDate}\\nTime: ${schedule.timeDisplay || ''}\\n\\nRemember to move your car before sweeping starts!`;
+
+            // Local time format for DTSTART/DTEND (interpreted as user's local timezone)
             const formatICalDate = (date) => {
                 const pad = (n) => n.toString().padStart(2, '0');
-                return date.getUTCFullYear() + 
-                       pad(date.getUTCMonth() + 1) + 
-                       pad(date.getUTCDate()) + 
-                       'T' + 
-                       pad(date.getUTCHours()) + 
-                       pad(date.getUTCMinutes()) + 
+                return date.getFullYear() +
+                       pad(date.getMonth() + 1) +
+                       pad(date.getDate()) +
+                       'T' +
+                       pad(date.getHours()) +
+                       pad(date.getMinutes()) +
+                       pad(date.getSeconds());
+            };
+            // UTC format for DTSTAMP
+            const formatICalDateUTC = (date) => {
+                const pad = (n) => n.toString().padStart(2, '0');
+                return date.getUTCFullYear() +
+                       pad(date.getUTCMonth() + 1) +
+                       pad(date.getUTCDate()) +
+                       'T' +
+                       pad(date.getUTCHours()) +
+                       pad(date.getUTCMinutes()) +
                        pad(date.getUTCSeconds()) + 'Z';
             };
-            
+
             const icsContent = [
                 'BEGIN:VCALENDAR',
                 'VERSION:2.0',
                 'PRODID:-//SF Street Sweeping//EN',
                 'BEGIN:VEVENT',
                 `UID:${Date.now()}@streetsweeping.sf`,
-                `DTSTAMP:${formatICalDate(new Date())}`,
+                `DTSTAMP:${formatICalDateUTC(new Date())}`,
                 `DTSTART:${formatICalDate(eventStart)}`,
                 `DTEND:${formatICalDate(eventEnd)}`,
-                `SUMMARY:Move Car - Street Sweeping`,
-                `DESCRIPTION:Street sweeping at ${address}${sideName}\\nTime: ${timeRange}\\n\\nRemember to move your car before sweeping starts!`,
+                'SUMMARY:Move Car - Street Sweeping',
+                `DESCRIPTION:${description}`,
                 `LOCATION:${address}`,
-                `BEGIN:VALARM`,
-                `TRIGGER:-PT${reminder1Minutes}M`,
-                `ACTION:DISPLAY`,
-                `DESCRIPTION:Move car for street sweeping tomorrow`,
-                `END:VALARM`,
-                `BEGIN:VALARM`,
-                `TRIGGER:-PT${reminder2Minutes}M`,
-                `ACTION:DISPLAY`,
-                `DESCRIPTION:Street sweeping starts soon!`,
-                `END:VALARM`,
                 'END:VEVENT',
                 'END:VCALENDAR'
             ].join('\r\n');
-            
+
             const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -1207,8 +1328,8 @@
             link.click();
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
-            
-            showSuccessMessage();
+
+            showSuccessMessage('✅ Calendar event downloaded! Open it to add to your calendar.');
         }
 
         // Show success message
